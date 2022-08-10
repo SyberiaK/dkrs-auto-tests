@@ -8,42 +8,52 @@ class BasePageLocators:
     USER_ICON = (By.CSS_SELECTOR, ".icon-user")"""
 
 
-# TODO: переписать локаторы под авторизацию на этом проекте
-
 class AuthPageLocators:
-    EMAIL_INPUT = (By.CSS_SELECTOR, '.email input')
-    PASSWORD_INPUT = (By.CSS_SELECTOR, '.password input')
-    LOGIN_BTN = (By.CSS_SELECTOR, 'button.login')
+    LOGIN_INPUT = By.CSS_SELECTOR, 'input#username'
+    PASSWORD_INPUT = By.CSS_SELECTOR, 'input#password'
+    LOGIN_BTN = By.CSS_SELECTOR, 'button#submit'
+
+
+class PersonPageLocators:
+    PERSON_INFO = By.CSS_SELECTOR, 'tbody tr'
+
+    DRAWER_CLOSE_BTN = By.CSS_SELECTOR, 'button.el-drawer__close-btn'
+    DIALOG_CLOSE_BTN = By.CSS_SELECTOR, 'button.el-dialog__headerbtn'
+    MSGBOX_CLOSE_BTN = By.CSS_SELECTOR, 'button.el-message-box__headerbtn'
 
 
 class PerformerPageLocators:
-    ADD_PERFORMER_BTN = (By.XPATH, '//button[@class="el-button el-button--primary"]')
-    PERFORMER_ID_INPUT = (By.XPATH, '//form[@class="el-form"]/div[1]//input')
-    OPERFORMER_FIO_INPUT = (By.XPATH, '//form[@class="el-form"]/div[2]//input')
-    PERFORMER_BIRTHYEAR_INPUT = (By.XPATH, '//form[@class="el-form"]/div[3]//input')
-    PERFORMER_PASSPORT_INPUT = (By.XPATH, '//form[@class="el-form"]/div[4]//input')
-    PERFORMER_INN_INPUT = (By.XPATH, '//form[@class="el-form"]/div[5]//input')
-    PERFORMER_PHONE_INPUT = (By.XPATH, '//form[@class="el-form"]/div[6]//input')
-    PERFORMER_BANKCARD_INPUT = (By.XPATH, '//form[@class="el-form"]/div[7]//input')
-    PERFORMER_SAVE_BTN = (By.XPATH, '//form[@class="el-form"]/div[8]//button')
+    ADD_PERFORMER_BTN = By.XPATH, '//button[@class="el-button el-button--primary"]'
+    PERFORMER_ID_INPUT = By.XPATH, '//form[@class="el-form"]/div[1]//input'
+    PERFORMER_FIO_INPUT = By.XPATH, '//form[@class="el-form"]/div[2]//input'
+    PERFORMER_BIRTHYEAR_INPUT = By.XPATH, '//form[@class="el-form"]/div[3]//input'
+    PERFORMER_PASSPORT_INPUT = By.XPATH, '//form[@class="el-form"]/div[4]//input'
+    PERFORMER_INN_INPUT = By.XPATH, '//form[@class="el-form"]/div[5]//input'
+    PERFORMER_PHONE_INPUT = By.XPATH, '//form[@class="el-form"]/div[6]//input'
+    PERFORMER_BANKCARD_INPUT = By.XPATH, '//form[@class="el-form"]/div[7]//input'
+    PERFORMER_SAVE_BTN = By.XPATH, '//form[@class="el-form"]/div[8]//button'
+
+    PERFORMER_INFO_ID = By.XPATH, '//tbody/tr[1]/td[1]//span/span'
+    PERFORMER_INFO_DATE = By.XPATH, '//tbody/tr[1]/td[2]//span/span'
+    PERFORMER_INFO_FIO = By.XPATH, '//tbody/tr[1]/td[3]//span/span'
+    PERFORMER_INFO_PHONE = By.XPATH, '//tbody/tr[1]/td[4]//span/span'
+    PERFORMER_INFO_QR_LINK = By.XPATH, '//tbody/tr[1]/td[5]//a'
+    PERFORMER_ADD_TO_BLACKLIST_BTN = By.XPATH, '//tbody/tr[1]/td[6]/div/div'
+
+    PERFORMER_BL_COMMENT_INPUT = By.CSS_SELECTOR, 'input.el-input__inner'
+    PERFORMER_BL_CONFIRM_BTN = By.CSS_SELECTOR, '.el-message-box__btns button.btn-next'
+    PERFORMER_BL_CANCEL_BTN = By.CSS_SELECTOR, '.el-message-box__btns button.el-button--default'
 
 
 # Все локаторы ниже не используются в коде и подлежат удалению.
 
 class WorkPageLocators:
-    MSGBOX_CANCEL_BTN = (By.CSS_SELECTOR, '.msgbox-cancel-btn')
-    MSGBOX_LEAVE_BTN = (By.CSS_SELECTOR, '.msgbox-leave-btn')
     MSGBOX2_CANCEL_BTN = (By.CSS_SELECTOR, '.el-button--default.el-button--small')
     MSGBOX2_DELETE_BTN = (By.CSS_SELECTOR, '.el-button--small.is-plain')
 
-    WORK_INFO = (By.CSS_SELECTOR, 'tbody tr')
-
-    WORK_CLOSE_BTN = (By.CSS_SELECTOR, 'button.el-dialog__headerbtn')
-
-    WORK_ELEM_INFO = (By.CSS_SELECTOR, 'div.AppTable tbody tr')
-
     DROPDOWN_CONTENT = (By.XPATH, '//div[@aria-hidden="false"]//li')
     DROPDOWN_CONTENT_SPAN = (By.XPATH, '//div[@aria-hidden="false"]//li/span')  # для некоторых полей
+
 
 class OrderPageLocators:
     CREATE_ORDER_BTN = (By.ID, 'order-create-btn')

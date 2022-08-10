@@ -5,6 +5,9 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 
 
 class BasePage:
+    NOT_PRESENT = 'not_present'
+    DISAPPEAR = 'disappear'
+
     def __init__(self, browser, url, timeout=10):
         self.browser = browser
         self.url = url
