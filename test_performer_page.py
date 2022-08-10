@@ -1,13 +1,11 @@
 import os
 import time
 import pytest
-from .pages.auth_page import AuthPage
-from .pages.order_page_READONLY import OrderPage  # TODO: удаляй при мне
+from pages.auth_page import AuthPage
+from pages.order_page_READONLY import OrderPage  # TODO: удаляй при мне
 from pages.performer_page import PerformerPage
 
-# TODO: заменить ссылку на новый проект
-main_link = 'http://u1609007.isp.regruhosting.ru/#'
-# login_link = 'http://u1609007.isp.regruhosting.ru/#/auth'
+main_link = 'https://test.dkrs.itmegastar.com/#/'
 
 
 @pytest.fixture(scope='function', autouse=True)
@@ -17,18 +15,17 @@ def setup(browser):
     page = AuthPage(browser, main_link)
     page.open()
     page.should_be_auth_page()
-    email = os.getenv('DKRS_ADMIN_MAIL')
+    login = os.getenv('DKRS_ADMIN_LOGIN')
     password = os.getenv('DKRS_ADMIN_PASSWORD')
-    page.auth(email, password)
+    page.auth(login, password)
 
     page = PerformerPage(browser, main_link)
 
 
-@pytest.mark.order  # TODO: переписать маркеры
-@pytest.mark.order_basis
+@pytest.mark.performer
+@pytest.mark.performer_basis
 class TestPerformerBasis:
 
-    @pytest.mark.begin
     def test_can_see_performer_add_button(self, browser):
         page.should_be_add_performer_button()
 
@@ -37,56 +34,55 @@ class TestPerformerBasis:
         page.go_to_add_performer()
         page.should_be_performer_creation()
 
-    def test_cant_see_order_creation(self, browser):
+    def test_cant_see_performer_creation(self, browser):
         page.should_be_add_performer_button()
         page.browser.implicitly_wait(0)
-        page.should_not_be_performer_creation("pres")
+        page.should_not_be_performer_creation(PerformerPage.NOT_PRESENT)
 
-    # АТЕНШОН! Тесты ниже прямиком из старого проекта, некоторые из них будут переписаны или удалены.
-    def test_can_cancel_order_creation(self, browser):
-        page.go_to_create_order()
-        page.go_to_cancel()
-        page.cancel('leave')
+    def test_can_cancel_performer_creation(self, browser):
+        page.go_to_add_performer()
+        page.close_drawer()
         page.browser.implicitly_wait(0)
-        page.should_not_be_order_creation("dis")
-
-    def test_can_go_back_to_order_creation(self, browser):
-        page.go_to_create_order()
-        page.go_to_cancel()
-        page.cancel('cancel')
-        page.should_be_order_creation()
+        page.should_not_be_performer_creation(PerformerPage.DISAPPEAR)
 
 
-@pytest.mark.order
-@pytest.mark.order_creation
+# @pytest.mark.order    # TODO: переписать маркеры
+# @pytest.mark.order_creation
 class TestOrderCreation:
     @pytest.fixture(scope='function', autouse=True)
     def setup(self, browser):
         page = AuthPage(browser, main_link)
         page.open()
         page.should_be_auth_page()
-        email = os.getenv('SPRING_ADMIN_MAIL')
-        password = os.getenv('SPRING_ADMIN_PASSWORD')
-        page.auth(email, password)
+        login = os.getenv('DKRS_ADMIN_LOGIN')
+        password = os.getenv('DKRS_ADMIN_PASSWORD')
+        page.auth(login, password)
 
-        self.page = OrderPage(browser, main_link)
+        self.page = PerformerPage(browser, main_link)
 
-        self.page.should_be_create_order_button()
-        self.order_number = f'AUTOTEST_{int(time.time())}'
-        self.page.go_to_create_order()
+        self.page.should_be_add_performer_button()
+        self.performer_fio = f'111_AUTOTEST_{int(time.time())}'
+        self.phone = str(int(time.time()))[:10]
+        self.page.go_to_add_performer()
 
-        self.page.create_order(self.order_number)
+        self.page.add_performer(self.performer_fio, '1996', '3697123456', self.phone)
         time.sleep(1)
+        yield
+        try:
+            self.page.go_to_blacklist()
+            self.page.blacklist()
+        except Exception as e:
+            print(f'>> {e}')
+            print(f'>> {self.performer_fio}')
 
-    def test_can_see_order_draft_after_creation(self, browser):
-        self.page.should_be_order_draft()
+    def test_cant_see_performer_creation_after_creation(self, browser):
         self.page.browser.implicitly_wait(0)
-        self.page.should_not_be_order_creation("dis")
+        self.page.should_not_be_performer_creation(PerformerPage.DISAPPEAR)
 
+    @pytest.mark.fast
     def test_expected_order_info_equals_actual(self, browser):
-        self.page.open()
-        time.sleep(1)
-        self.page.check_order_info(self.order_number)
+        expected_phone = f'+7 {self.phone[:3]} {self.phone[3:6]} {self.phone[6:8]} {self.phone[8:]}'
+        self.page.check_performer_info(self.performer_fio, expected_phone)
 
     def test_expected_order_info_equals_actual_in_draft(self, browser):
         self.page.check_order_draft_info(self.order_number)
@@ -139,8 +135,8 @@ class TestOrderCreation:
         self.page.check_order_draft_info(self.order_number)    # поэтому сверяем со старыми данными (дефолтными)
 
 
-@pytest.mark.order_element
-@pytest.mark.order_element_basis
+# @pytest.mark.order_element
+# @pytest.mark.order_element_basis
 class TestOrderElementBasis:
     @pytest.fixture(scope='function', autouse=True)
     def setup(self, browser):
@@ -187,8 +183,8 @@ class TestOrderElementBasis:
         self.page.should_be_element_creation()
 
 
-@pytest.mark.order_element
-@pytest.mark.order_element_creation
+# @pytest.mark.order_element
+# @pytest.mark.order_element_creation
 class TestOrderElementCreation:
     @pytest.fixture(scope='function', autouse=True)
     def setup(self, browser):
