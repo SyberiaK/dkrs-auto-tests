@@ -62,30 +62,54 @@ class TestOrderCreation:
 
         self.page.should_be_add_performer_button()
         self.performer_fio = f'111_AUTOTEST_{int(time.time())}'
+        self.birthyear = '1996'
+        self.passport = '3697123456'
         self.phone = str(int(time.time()))[:10]
         self.page.go_to_add_performer()
 
-        self.page.add_performer(self.performer_fio, '1996', '3697123456', self.phone)
+        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, self.phone)
         time.sleep(1)
         yield
         try:
             self.page.go_to_blacklist()
             self.page.blacklist()
         except Exception as e:
-            print(f'>> {e}')
-            print(f'>> {self.performer_fio}')
+            print('>> ERROR!: Failed deleting the performer.')
+            print(f'>> Reason: {e}')
+            print(f'>> Delete the performer with this FIO: {self.performer_fio}')
 
     def test_cant_see_performer_creation_after_creation(self, browser):
         self.page.browser.implicitly_wait(0)
         self.page.should_not_be_performer_creation(PerformerPage.DISAPPEAR)
 
-    @pytest.mark.fast
-    def test_expected_order_info_equals_actual(self, browser):
+    def test_cant_see_performer_detailed_info_after_creation(self, browser):
+        self.page.browser.implicitly_wait(0)
+        time.sleep(3)
+        self.page.should_not_be_performer_detailed_info(PerformerPage.NOT_PRESENT)
+
+    def test_expected_performer_info_equals_actual(self, browser):
         expected_phone = f'+7 {self.phone[:3]} {self.phone[3:6]} {self.phone[6:8]} {self.phone[8:]}'
         self.page.check_performer_info(self.performer_fio, expected_phone)
 
-    def test_expected_order_info_equals_actual_in_draft(self, browser):
-        self.page.check_order_draft_info(self.order_number)
+    def test_can_see_performer_detailed_info(self, browser):
+        self.page.go_to_detailed_info()
+        self.page.should_be_performer_detailed_info()
+
+    def test_can_close_performer_detailed_info(self, browser):
+        self.page.go_to_detailed_info()
+        self.page.should_be_performer_detailed_info()
+        self.page.close_drawer()
+        self.page.browser.implicitly_wait(0)
+        self.page.should_not_be_performer_detailed_info(PerformerPage.DISAPPEAR)
+
+    @pytest.mark.fast
+    def test_expected_performer_detailed_info_equals_actual(self, browser):
+        time.sleep(2)
+        self.page.go_to_detailed_info()
+        expected_phone = f'+7 {self.phone[:3]} {self.phone[3:6]} {self.phone[6:8]} {self.phone[8:]}'
+        time.sleep(1)
+        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear,
+                                                f'{self.passport[:4]} {self.passport[4:]}', expected_phone)
 
     def test_edit_and_save_see_summary(self, browser):
         sett = (f'EDITED_{self.order_number}', '30.03.2002', None, '123123')
