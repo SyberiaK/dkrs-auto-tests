@@ -4,7 +4,7 @@ from .locators import PersonPageLocators
 
 class PersonPage(BasePage):
 
-    def go_to_person(self):
+    def go_to_detailed_info(self):
         self.browser.find_element(*PersonPageLocators.PERSON_INFO).click()
 
     def close_drawer(self):
