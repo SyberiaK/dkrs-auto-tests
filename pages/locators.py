@@ -24,6 +24,7 @@ class PersonPageLocators:
 
 class PerformerPageLocators:
     ADD_PERFORMER_BTN = By.XPATH, '//button[@class="el-button el-button--primary"]'
+
     PERFORMER_ID_INPUT = By.XPATH, '//form[@class="el-form"]/div[1]//input'
     PERFORMER_FIO_INPUT = By.XPATH, '//form[@class="el-form"]/div[2]//input'
     PERFORMER_BIRTHYEAR_INPUT = By.XPATH, '//form[@class="el-form"]/div[3]//input'
@@ -31,7 +32,18 @@ class PerformerPageLocators:
     PERFORMER_INN_INPUT = By.XPATH, '//form[@class="el-form"]/div[5]//input'
     PERFORMER_PHONE_INPUT = By.XPATH, '//form[@class="el-form"]/div[6]//input'
     PERFORMER_BANKCARD_INPUT = By.XPATH, '//form[@class="el-form"]/div[7]//input'
+    PERFORMER_STATUS_INPUT = By.XPATH, '//form[@class="el-form"]/div[9]//input'
     PERFORMER_SAVE_BTN = By.XPATH, '//form[@class="el-form"]/div[8]//button'
+
+    PERFORMER_CREATION = {'Performer ID input': PERFORMER_ID_INPUT,
+                          'Performer FIO input': PERFORMER_FIO_INPUT,
+                          'Performer birth year input': PERFORMER_BIRTHYEAR_INPUT,
+                          'Performer passport input': PERFORMER_PASSPORT_INPUT,
+                          'Performer INN input': PERFORMER_INN_INPUT,
+                          'Performer phone input': PERFORMER_PHONE_INPUT,
+                          'Performer bank card input': PERFORMER_BANKCARD_INPUT,
+                          'Performer status input': PERFORMER_STATUS_INPUT,
+                          'Save performer button': PERFORMER_SAVE_BTN}
 
     PERFORMER_INFO_ID = By.XPATH, '//tbody/tr[1]/td[1]//span/span'
     PERFORMER_INFO_DATE = By.XPATH, '//tbody/tr[1]/td[2]//span/span'
@@ -39,6 +51,31 @@ class PerformerPageLocators:
     PERFORMER_INFO_PHONE = By.XPATH, '//tbody/tr[1]/td[4]//span/span'
     PERFORMER_INFO_QR_LINK = By.XPATH, '//tbody/tr[1]/td[5]//a'
     PERFORMER_ADD_TO_BLACKLIST_BTN = By.XPATH, '//tbody/tr[1]/td[6]/div/div'
+
+    PERFORMER_DETAILED_INFO_ID_INPUT = By.XPATH, '//form[@class="el-form"]/div[1]//input'
+    PERFORMER_DETAILED_INFO_FIO_INPUT = By.XPATH, '//form[@class="el-form"]/div[2]//input'
+    PERFORMER_DETAILED_INFO_BIRTHYEAR_INPUT = By.XPATH, '//form[@class="el-form"]/div[3]//input'
+    PERFORMER_DETAILED_INFO_PASSPORT_INPUT = By.XPATH, '//form[@class="el-form"]/div[4]//input'
+    PERFORMER_DETAILED_INFO_INN_INPUT = By.XPATH, '//form[@class="el-form"]/div[5]//input'
+    PERFORMER_DETAILED_INFO_PHONE_INPUT = By.XPATH, '//form[@class="el-form"]/div[6]//input'
+    PERFORMER_DETAILED_INFO_BANKCARD_INPUT = By.XPATH, '//form[@class="el-form"]/div[7]//input'
+    PERFORMER_DETAILED_INFO_QR_LINK = By.XPATH, '//form[@class="el-form"]/div[8]//a'
+    PERFORMER_DETAILED_INFO_STATUS_INPUT = By.XPATH, '//form[@class="el-form"]/div[9]//input'
+    PERFORMER_DETAILED_INFO_SAVE_BTN = By.XPATH, '//form[@class="el-form"]/div[10]//button'
+
+    PERFORMER_DETAILED_INFO = {'Performer ID input in detailed info': PERFORMER_DETAILED_INFO_ID_INPUT,
+                               'Performer FIO input in detailed info': PERFORMER_DETAILED_INFO_FIO_INPUT,
+                               'Performer birth year input in detailed info': PERFORMER_DETAILED_INFO_BIRTHYEAR_INPUT,
+                               'Performer passport input in detailed info': PERFORMER_DETAILED_INFO_PASSPORT_INPUT,
+                               'Performer INN input in detailed info': PERFORMER_DETAILED_INFO_INN_INPUT,
+                               'Performer phone input in detailed info': PERFORMER_DETAILED_INFO_PHONE_INPUT,
+                               'Performer bank card input in detailed info': PERFORMER_DETAILED_INFO_BANKCARD_INPUT,
+                               'Performer QR code link in detailed info': PERFORMER_DETAILED_INFO_QR_LINK,
+                               'Performer status input in detailed info': PERFORMER_DETAILED_INFO_STATUS_INPUT,
+                               'Save performer button in detailed info': PERFORMER_DETAILED_INFO_SAVE_BTN}
+
+    PERFORMER_BL_DETAILED_INFO_COMMENT_INPUT = By.XPATH, '//form[@class="el-form"]/div[10]//input'
+    PERFORMER_BL_DETAILED_INFO_SAVE_BTN = By.XPATH, '//form[@class="el-form"]/div[11]//button'
 
     PERFORMER_BL_COMMENT_INPUT = By.CSS_SELECTOR, 'input.el-input__inner'
     PERFORMER_BL_CONFIRM_BTN = By.CSS_SELECTOR, '.el-message-box__btns button.btn-next'
