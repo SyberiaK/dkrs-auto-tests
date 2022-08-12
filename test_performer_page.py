@@ -65,6 +65,8 @@ class TestOrderCreation:
         self.birthyear = '1996'
         self.passport = '3697123456'
         self.phone = str(int(time.time()))[:10]
+        self.inn = '8383838383838383838'
+        self.bank_card = '5454545454545454'
         self.page.go_to_add_performer()
 
         self.page.add_performer(self.performer_fio, self.birthyear, self.passport, self.phone)
@@ -102,61 +104,100 @@ class TestOrderCreation:
         self.page.browser.implicitly_wait(0)
         self.page.should_not_be_performer_detailed_info(PerformerPage.DISAPPEAR)
 
-    @pytest.mark.fast
     def test_expected_performer_detailed_info_equals_actual(self, browser):
-        time.sleep(2)
         self.page.go_to_detailed_info()
         expected_phone = f'+7 {self.phone[:3]} {self.phone[3:6]} {self.phone[6:8]} {self.phone[8:]}'
-        time.sleep(1)
         self.page.check_performer_detailed_info(self.performer_fio, self.birthyear,
                                                 f'{self.passport[:4]} {self.passport[4:]}', expected_phone)
+        self.page.close_drawer()
 
     def test_edit_and_save_see_summary(self, browser):
-        sett = (f'EDITED_{self.order_number}', '30.03.2002', None, '123123')
+        fio, phone = f'111_EDITED_{self.performer_fio}', str(int(time.time()))[:10]
 
-        self.page.edit_order(*sett)
-        self.page.save_order()
+        self.page.go_to_detailed_info()
+        self.page.edit_performer(fio=fio, phone=phone)
+        self.page.save_performer()
 
-        sett = (f'EDITED_{self.order_number}', '30.03.2002', '123123')
-        OrderPage(browser, main_link).open()
-        self.page.check_order_info(*sett)
+        expected_phone = f'+7 {phone[:3]} {phone[3:6]} {phone[6:8]} {phone[8:]}'
+        self.page.check_performer_info(expected_fio=fio, expected_phone=expected_phone)
 
     def test_edit_and_save_see_draft(self, browser):
-        sett = (f'EDITED_{self.order_number}', '30.03.2002',
-                'Shop 1 Shop 1 Shop 1 Shop 1 Shop 1 Shop 1 Shop 1 Shop '
-                '1 Shop 1 Shop 1 Shop 1 Shop 1 Shop 1 Shop 1 Shop 1', '123123')
+        fio, birthyear = f'111_EDITED_{self.performer_fio}', '2002',
+        passport, phone = "1111 222222", str(int(time.time()))[:10]
 
-        self.page.edit_order(*sett)
-        self.page.save_order()
+        self.page.go_to_detailed_info()
+        self.page.edit_performer(fio=fio, birthyear=birthyear, passport=passport, phone=phone)
+        self.page.save_performer()
 
-        OrderPage(browser, main_link).open()
-        time.sleep(1)
-        self.page.go_to_work()
-        self.page.check_order_draft_info(*sett)
+        expected_phone = f'+7 {phone[:3]} {phone[3:6]} {phone[6:8]} {phone[8:]}'
+        self.page.go_to_detailed_info()
+        self.page.check_performer_detailed_info(expected_fio=fio, expected_birthyear=birthyear,
+                                                expected_passport=passport, expected_phone=expected_phone)
+        self.page.close_drawer()
 
     def test_edit_and_not_save_see_summary(self, browser):
-        sett = (f'EDITED_{self.order_number}', '30.03.2002', None, '123123')
+        fio, phone = f'111_EDITED_{self.performer_fio}', str(int(time.time()))[:10]
 
-        self.page.edit_order(*sett)
-        # self.page.save_order()    # не сохраняем!
+        self.page.go_to_detailed_info()
+        self.page.edit_performer(fio=fio, phone=phone)
+        self.page.close_drawer()  # просто закрываем, не сохраняем!
 
-        OrderPage(browser, main_link).open()
-        time.sleep(1)
-        self.page.check_order_info(self.order_number)    # поэтому сверяем со старыми данными (дефолтными)
+        # поэтому сверяем со старыми данными (дефолтными)
+        expected_phone = f'+7 {self.phone[:3]} {self.phone[3:6]} {self.phone[6:8]} {self.phone[8:]}'
+        self.page.check_performer_info(expected_fio=self.performer_fio, expected_phone=expected_phone)
 
     def test_edit_and_not_save_see_draft(self, browser):
-        sett = (f'EDITED_{self.order_number}', '30.03.2002',
-                'Shop 1 Shop 1 Shop 1 Shop 1 Shop 1 Shop 1 Shop 1 Shop 1'
-                ' Shop 1 Shop 1 Shop 1 Shop 1 Shop 1 Shop 1 Shop 1',
-                '123123')
+        fio, birthyear = f'111_EDITED_{self.performer_fio}', '2002',
+        passport, phone = "1111 222222", str(int(time.time()))[:10]
 
-        self.page.edit_order(*sett)
-        # self.page.save_order()    # не сохраняем!
+        self.page.go_to_detailed_info()
+        self.page.edit_performer(fio=fio, birthyear=birthyear, passport=passport, phone=phone)
+        self.page.close_drawer()  # просто закрываем, не сохраняем!
 
-        OrderPage(browser, main_link).open()
-        time.sleep(1)
-        self.page.go_to_work()
-        self.page.check_order_draft_info(self.order_number)    # поэтому сверяем со старыми данными (дефолтными)
+        # поэтому сверяем со старыми данными (дефолтными)
+        expected_phone = f'+7 {self.phone[:3]} {self.phone[3:6]} {self.phone[6:8]} {self.phone[8:]}'
+        expected_passport = f'{self.passport[:4]} {self.passport[4:]}'
+        self.page.go_to_detailed_info()
+        self.page.check_performer_detailed_info(expected_fio=self.performer_fio, expected_birthyear=self.birthyear,
+                                                expected_passport=expected_passport, expected_phone=expected_phone)
+        self.page.close_drawer()
+
+    def test_performer_should_be_selected_if_no_inn_and_no_bank_card(self, browser):
+        self.page.check_performer_selection(True)
+        self.page.go_to_blacklist()
+        self.page.blacklist()
+
+    def test_performer_should_be_selected_if_inn_and_no_bank_card(self, browser):
+        self.page.go_to_blacklist()
+        self.page.blacklist()
+
+        phone = str(int(time.time()))[:10]
+        self.page.go_to_add_performer()
+        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, phone, inn=self.inn)
+
+        self.page.check_performer_selection(True)
+
+    def test_performer_should_be_selected_if_no_inn_and_bank_card(self, browser):
+        self.page.go_to_blacklist()
+        self.page.blacklist()
+
+        phone = str(int(time.time()))[:10]
+        self.page.go_to_add_performer()
+        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, phone, bank_card=self.bank_card)
+
+        self.page.check_performer_selection(True)
+
+    @pytest.mark.fast
+    def test_performer_should_not_be_selected_if_inn_and_bank_card(self, browser):
+        self.page.go_to_blacklist()
+        self.page.blacklist()
+
+        phone = str(int(time.time()) + 2)[:10]
+        self.page.go_to_add_performer()
+        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, phone, inn=self.inn,
+                                bank_card=self.bank_card)
+
+        self.page.check_performer_selection(False)
 
 
 # @pytest.mark.order_element
