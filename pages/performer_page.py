@@ -1,5 +1,6 @@
 import time
 import datetime as dt
+from selenium.webdriver.common.keys import Keys
 
 from .person_page import PersonPage
 from .locators import PerformerPageLocators
@@ -32,9 +33,9 @@ class PerformerPage(PersonPage):
                       birth_year: str,
                       passport: str,
                       phone: str,
-                      performer_id: str = '',
-                      inn: str = '',
-                      bank_card: str = ''):
+                      performer_id: str = None,
+                      inn: str = None,
+                      bank_card: str = None):
         if performer_id:
             self.browser.find_element(*PerformerPageLocators.PERFORMER_ID_INPUT).send_keys(performer_id)
         self.browser.find_element(*PerformerPageLocators.PERFORMER_FIO_INPUT).send_keys(fio)
@@ -46,6 +47,7 @@ class PerformerPage(PersonPage):
         if bank_card:
             self.browser.find_element(*PerformerPageLocators.PERFORMER_BANKCARD_INPUT).send_keys(bank_card)
         self.browser.find_element(*PerformerPageLocators.PERFORMER_SAVE_BTN).click()
+        time.sleep(1)
 
     def check_performer_info(self,
                              expected_fio: str,
@@ -94,9 +96,9 @@ class PerformerPage(PersonPage):
                                       expected_birthyear: str,
                                       expected_passport: str,
                                       expected_phone: str,
-                                      expected_id: str = '',
-                                      expected_inn: str = '',
-                                      expected_bankcard: str = '',
+                                      expected_id: str = None,
+                                      expected_inn: str = None,
+                                      expected_bankcard: str = None,
                                       expected_status: str = 'Активен'):
         expected_id = expected_id if expected_id else '<EMPTY>'
         expected_fio = expected_fio if expected_fio else '<EMPTY>'
@@ -107,15 +109,22 @@ class PerformerPage(PersonPage):
         expected_bankcard = expected_bankcard if expected_bankcard else '<EMPTY>'
         expected_status = expected_status if expected_status else '<EMPTY>'
 
-        actual_id = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_ID_INPUT).text
-        actual_fio = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_FIO_INPUT).text
-        actual_birthyear = self.browser\
-            .find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_BIRTHYEAR_INPUT).text
-        actual_passport = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_PASSPORT_INPUT).text
-        actual_inn = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_INN_INPUT).text
-        actual_phone = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_PHONE_INPUT).text
-        actual_bankcard = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_BANKCARD_INPUT).text
-        actual_status = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_STATUS_INPUT).text
+        actual_id = self.browser.find_element(*PerformerPageLocators
+                                              .PERFORMER_DETAILED_INFO_ID_INPUT).get_property('value')
+        actual_fio = self.browser.find_element(*PerformerPageLocators
+                                               .PERFORMER_DETAILED_INFO_FIO_INPUT).get_property('value')
+        actual_birthyear = self.browser.find_element(*PerformerPageLocators
+                                                     .PERFORMER_DETAILED_INFO_BIRTHYEAR_INPUT).get_property('value')
+        actual_passport = self.browser.find_element(*PerformerPageLocators
+                                                    .PERFORMER_DETAILED_INFO_PASSPORT_INPUT).get_property('value')
+        actual_inn = self.browser.find_element(*PerformerPageLocators
+                                               .PERFORMER_DETAILED_INFO_INN_INPUT).get_property('value')
+        actual_phone = self.browser.find_element(*PerformerPageLocators
+                                                 .PERFORMER_DETAILED_INFO_PHONE_INPUT).get_property('value')
+        actual_bankcard = self.browser.find_element(*PerformerPageLocators
+                                                    .PERFORMER_DETAILED_INFO_BANKCARD_INPUT).get_property('value')
+        actual_status = self.browser.find_element(*PerformerPageLocators
+                                                  .PERFORMER_DETAILED_INFO_STATUS_INPUT).get_property('value')
 
         actual_id = actual_id if actual_id else '<EMPTY>'
         actual_fio = actual_fio if actual_fio else '<EMPTY>'
@@ -132,16 +141,65 @@ class PerformerPage(PersonPage):
                                            f'expected: {expected_fio}'
         assert actual_birthyear == expected_birthyear, f'Actual birth year: {actual_birthyear}, ' \
                                                        f'expected: {expected_birthyear}'
-        assert actual_passport == expected_passport, f'Actual FIO: {actual_passport}, ' \
+        assert actual_passport == expected_passport, f'Actual passport: {actual_passport}, ' \
                                                      f'expected: {expected_passport}'
-        assert actual_inn == expected_inn, f'Actual birth year: {actual_inn}, ' \
+        assert actual_inn == expected_inn, f'Actual INN: {actual_inn}, ' \
                                            f'expected: {expected_inn}'
         assert actual_phone == expected_phone, f'Actual phone: {actual_phone}, ' \
                                                f'expected: {expected_phone}'
-        assert actual_bankcard == expected_bankcard, f'Actual birth year: {actual_bankcard}, ' \
+        assert actual_bankcard == expected_bankcard, f'Actual bank card: {actual_bankcard}, ' \
                                                      f'expected: {expected_bankcard}'
-        assert actual_status == expected_status, f'Actual phone: {actual_status}, ' \
-                                               f'expected: {expected_status}'
+        assert actual_status == expected_status, f'Actual status: {actual_status}, ' \
+                                                 f'expected: {expected_status}'
+
+    def edit_performer(self,
+                       performer_id: str = None,
+                       fio: str = None,
+                       birthyear: str = None,
+                       passport: str = None,
+                       inn: str = None,
+                       phone: str = None,
+                       bank_card: str = None):
+        if not (fio or birthyear or passport or phone or performer_id or inn or bank_card):
+            raise AssertionError('No edit')
+        if performer_id:
+            entry = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_ID_INPUT)
+            entry.send_keys(Keys.CONTROL + "a")
+            entry.send_keys(performer_id)
+        if fio:
+            entry = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_FIO_INPUT)
+            entry.send_keys(Keys.CONTROL + "a")
+            entry.send_keys(fio)
+        if birthyear:
+            entry = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_BIRTHYEAR_INPUT)
+            entry.send_keys(Keys.CONTROL + "a")
+            entry.send_keys(birthyear)
+        if passport:
+            entry = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_PASSPORT_INPUT)
+            entry.send_keys(Keys.CONTROL + "a")
+            entry.send_keys(passport)
+        if inn:
+            entry = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_INN_INPUT)
+            entry.send_keys(Keys.CONTROL + "a")
+            entry.send_keys(inn)
+        if phone:
+            entry = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_PHONE_INPUT)
+            entry.send_keys(Keys.CONTROL + "a")
+            entry.send_keys(phone)
+        if bank_card:
+            entry = self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_BANKCARD_INPUT)
+            entry.send_keys(Keys.CONTROL + "a")
+            entry.send_keys(bank_card)
+
+    def save_performer(self):
+        self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_SAVE_BTN).click()
+        time.sleep(1)
+
+    def check_performer_selection(self, expected_result: bool):
+        classes = self.browser.find_element(*PerformerPageLocators.PERFORMER_INFO_SELECT_CHECKER).get_attribute("class")
+        actual_result = 'selected' in classes
+        assert actual_result == expected_result, f'Performer selection, actual result: {actual_result}, ' \
+                                                 f'expected: {expected_result}'
 
     def go_to_blacklist(self):
         self.browser.find_element(*PerformerPageLocators.PERFORMER_ADD_TO_BLACKLIST_BTN).click()

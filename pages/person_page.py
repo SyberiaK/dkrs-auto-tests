@@ -1,3 +1,5 @@
+import time
+
 from .base_page import BasePage
 from .locators import PersonPageLocators
 
@@ -9,6 +11,7 @@ class PersonPage(BasePage):
 
     def close_drawer(self):
         self.browser.find_element(*PersonPageLocators.DRAWER_CLOSE_BTN).click()
+        time.sleep(1)
 
     '''def cancel(self,
                dec: str):
