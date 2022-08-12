@@ -45,6 +45,7 @@ class PerformerPageLocators:
                           'Performer status input': PERFORMER_STATUS_INPUT,
                           'Save performer button': PERFORMER_SAVE_BTN}
 
+    PERFORMER_INFO_SELECT_CHECKER = By.XPATH, '//tbody/tr[1]/td[1]/div/span'
     PERFORMER_INFO_ID = By.XPATH, '//tbody/tr[1]/td[1]//span/span'
     PERFORMER_INFO_DATE = By.XPATH, '//tbody/tr[1]/td[2]//span/span'
     PERFORMER_INFO_FIO = By.XPATH, '//tbody/tr[1]/td[3]//span/span'
