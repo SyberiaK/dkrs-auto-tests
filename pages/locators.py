@@ -15,6 +15,9 @@ class AuthPageLocators:
 
 
 class PersonPageLocators:
+    PEOPLE_ACTIVE_TAB = By.ID, 'tab-Active'
+    PEOPLE_REMOVED_TAB = By.ID, 'tab-Removed'
+
     PERSON_INFO = By.CSS_SELECTOR, 'tbody tr'
 
     DRAWER_CLOSE_BTN = By.CSS_SELECTOR, 'button.el-drawer__close-btn'
@@ -32,7 +35,6 @@ class PerformerPageLocators:
     PERFORMER_INN_INPUT = By.XPATH, '//form[@class="el-form"]/div[5]//input'
     PERFORMER_PHONE_INPUT = By.XPATH, '//form[@class="el-form"]/div[6]//input'
     PERFORMER_BANKCARD_INPUT = By.XPATH, '//form[@class="el-form"]/div[7]//input'
-    PERFORMER_STATUS_INPUT = By.XPATH, '//form[@class="el-form"]/div[9]//input'
     PERFORMER_SAVE_BTN = By.XPATH, '//form[@class="el-form"]/div[8]//button'
 
     PERFORMER_CREATION = {'Performer ID input': PERFORMER_ID_INPUT,
@@ -42,7 +44,6 @@ class PerformerPageLocators:
                           'Performer INN input': PERFORMER_INN_INPUT,
                           'Performer phone input': PERFORMER_PHONE_INPUT,
                           'Performer bank card input': PERFORMER_BANKCARD_INPUT,
-                          'Performer status input': PERFORMER_STATUS_INPUT,
                           'Save performer button': PERFORMER_SAVE_BTN}
 
     PERFORMER_INFO_SELECT_CHECKER = By.XPATH, '//tbody/tr[1]/td[1]/div/span'
@@ -51,7 +52,7 @@ class PerformerPageLocators:
     PERFORMER_INFO_FIO = By.XPATH, '//tbody/tr[1]/td[3]//span/span'
     PERFORMER_INFO_PHONE = By.XPATH, '//tbody/tr[1]/td[4]//span/span'
     PERFORMER_INFO_QR_LINK = By.XPATH, '//tbody/tr[1]/td[5]//a'
-    PERFORMER_ADD_TO_BLACKLIST_BTN = By.XPATH, '//tbody/tr[1]/td[6]/div/div'
+    PERFORMER_ADD_TO_BLACKLIST_BTN = PERFORMER_RETURN_FROM_BLACKLIST_BTN = By.XPATH, '//tbody/tr[1]/td[6]/div/div'
 
     PERFORMER_DETAILED_INFO_ID_INPUT = By.XPATH, '//form[@class="el-form"]/div[1]//input'
     PERFORMER_DETAILED_INFO_FIO_INPUT = By.XPATH, '//form[@class="el-form"]/div[2]//input'
