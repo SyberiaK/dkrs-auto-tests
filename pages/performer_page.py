@@ -7,7 +7,6 @@ from .locators import PerformerPageLocators
 
 
 class PerformerPage(PersonPage):
-
     def should_be_add_performer_button(self):
         assert self.is_element_present(*PerformerPageLocators.ADD_PERFORMER_BTN), \
             'Add performer button is not presented'
@@ -99,7 +98,8 @@ class PerformerPage(PersonPage):
                                       expected_id: str = None,
                                       expected_inn: str = None,
                                       expected_bankcard: str = None,
-                                      expected_status: str = 'Активен'):
+                                      expected_status: str = 'Активен',
+                                      expected_comment: str = ''):
         expected_id = expected_id if expected_id else '<EMPTY>'
         expected_fio = expected_fio if expected_fio else '<EMPTY>'
         expected_birthyear = expected_birthyear if expected_birthyear else '<EMPTY>'
@@ -151,6 +151,19 @@ class PerformerPage(PersonPage):
                                                      f'expected: {expected_bankcard}'
         assert actual_status == expected_status, f'Actual status: {actual_status}, ' \
                                                  f'expected: {expected_status}'
+
+        if actual_status == 'В черном списке':
+            expected_comment = expected_comment if expected_comment else '<EMPTY>'
+
+            assert self.is_element_present(*PerformerPageLocators.PERFORMER_BL_DETAILED_INFO_COMMENT_INPUT), \
+                f'Performer status is {actual_status}, but there are no comment input'
+
+            actual_comment = self.browser\
+                .find_element(*PerformerPageLocators.PERFORMER_BL_DETAILED_INFO_COMMENT_INPUT).get_property('value')
+            actual_comment = actual_comment if actual_comment else '<EMPTY>'
+
+            assert actual_comment == expected_comment, f'Actual comment: {actual_comment}, ' \
+                                                       f'expected: {expected_comment}'
 
     def edit_performer(self,
                        performer_id: str = None,
