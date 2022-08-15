@@ -1,54 +1,49 @@
 import os
 import time
 import pytest
-from pages.auth_page import AuthPage
+from pages.pages_list import AuthPage, PerformerPage
 from pages.order_page_READONLY import OrderPage  # TODO: удаляй при мне
-from pages.performer_page import PerformerPage
 
 main_link = 'https://test.dkrs.itmegastar.com/#/'
-
-
-@pytest.fixture(scope='function', autouse=True)
-def setup(browser):
-    global page
-
-    page = AuthPage(browser, main_link)
-    page.open()
-    page.should_be_auth_page()
-    login = os.getenv('DKRS_ADMIN_LOGIN')
-    password = os.getenv('DKRS_ADMIN_PASSWORD')
-    page.auth(login, password)
-
-    page = PerformerPage(browser, main_link)
 
 
 @pytest.mark.performer
 @pytest.mark.performer_basis
 class TestPerformerBasis:
+    @pytest.fixture(scope='function', autouse=True)
+    def setup(self, browser):
+        page = AuthPage(browser, main_link)
+        page.open()
+        page.should_be_auth_page()
+        login = os.getenv('DKRS_ADMIN_LOGIN')
+        password = os.getenv('DKRS_ADMIN_PASSWORD')
+        page.auth(login, password)
+
+        self.page = PerformerPage(browser, main_link)
 
     def test_can_see_performer_add_button(self, browser):
-        page.should_be_add_performer_button()
+        self.page.should_be_add_performer_button()
 
     def test_can_see_performer_creation(self, browser):
-        page.should_be_add_performer_button()
-        page.go_to_add_performer()
-        page.should_be_performer_creation()
+        self.page.should_be_add_performer_button()
+        self.page.go_to_add_performer()
+        self.page.should_be_performer_creation()
 
     def test_cant_see_performer_creation(self, browser):
-        page.should_be_add_performer_button()
-        page.browser.implicitly_wait(0)
-        page.should_not_be_performer_creation(PerformerPage.NOT_PRESENT)
+        self.page.should_be_add_performer_button()
+        self.page.browser.implicitly_wait(0)
+        self.page.should_not_be_performer_creation(PerformerPage.NOT_PRESENT)
 
     def test_can_cancel_performer_creation(self, browser):
-        page.go_to_add_performer()
-        page.close_drawer()
-        page.browser.implicitly_wait(0)
-        page.should_not_be_performer_creation(PerformerPage.DISAPPEAR)
+        self.page.go_to_add_performer()
+        self.page.close_drawer()
+        self.page.browser.implicitly_wait(0)
+        self.page.should_not_be_performer_creation(PerformerPage.DISAPPEAR)
 
 
-# @pytest.mark.order    # TODO: переписать маркеры
-# @pytest.mark.order_creation
-class TestOrderCreation:
+@pytest.mark.performer  # TODO: дописать маркеры
+@pytest.mark.performer_creation
+class TestPerformerCreation:
     @pytest.fixture(scope='function', autouse=True)
     def setup(self, browser):
         page = AuthPage(browser, main_link)
@@ -61,10 +56,12 @@ class TestOrderCreation:
         self.page = PerformerPage(browser, main_link)
 
         self.page.should_be_add_performer_button()
-        self.performer_fio = f'111_AUTOTEST_{int(time.time())}'
+        self.performer_fio = f'!000_AUTOTEST_{int(time.time())}'
         self.birthyear = '1996'
-        self.passport = '3697123456'
-        self.phone = str(int(time.time()))[:10]
+        self.raw_passport = '3697123456'
+        self.passport = f'{self.raw_passport[:4]} {self.raw_passport[4:]}'
+        self.raw_phone = str(int(time.time()))[:10]
+        self.phone = f'+7 {self.raw_phone[:3]} {self.raw_phone[3:6]} {self.raw_phone[6:8]} {self.raw_phone[8:]}'
         self.inn = '8383838383838383838'
         self.bank_card = '5454545454545454'
         self.page.go_to_add_performer()
@@ -76,9 +73,9 @@ class TestOrderCreation:
             self.page.go_to_blacklist()
             self.page.blacklist()
         except Exception as e:
-            print('>> ERROR!: Failed deleting the performer.')
+            print('>> ERROR!: Failed blacklisting the performer.')
             print(f'>> Reason: {e}')
-            print(f'>> Delete the performer with this FIO: {self.performer_fio}')
+            print(f'>> Blacklist the performer with this FIO: {self.performer_fio}')
 
     def test_cant_see_performer_creation_after_creation(self, browser):
         self.page.browser.implicitly_wait(0)
@@ -90,14 +87,9 @@ class TestOrderCreation:
         self.page.should_not_be_performer_detailed_info(PerformerPage.NOT_PRESENT)
 
     def test_expected_performer_info_equals_actual(self, browser):
-        expected_phone = f'+7 {self.phone[:3]} {self.phone[3:6]} {self.phone[6:8]} {self.phone[8:]}'
-        self.page.check_performer_info(self.performer_fio, expected_phone)
+        self.page.check_performer_info(self.performer_fio, self.phone)
 
-    def test_can_see_performer_detailed_info(self, browser):
-        self.page.go_to_detailed_info()
-        self.page.should_be_performer_detailed_info()
-
-    def test_can_close_performer_detailed_info(self, browser):
+    def test_can_see_and_close_performer_detailed_info(self, browser):
         self.page.go_to_detailed_info()
         self.page.should_be_performer_detailed_info()
         self.page.close_drawer()
@@ -106,13 +98,11 @@ class TestOrderCreation:
 
     def test_expected_performer_detailed_info_equals_actual(self, browser):
         self.page.go_to_detailed_info()
-        expected_phone = f'+7 {self.phone[:3]} {self.phone[3:6]} {self.phone[6:8]} {self.phone[8:]}'
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear,
-                                                f'{self.passport[:4]} {self.passport[4:]}', expected_phone)
+        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone)
         self.page.close_drawer()
 
     def test_edit_and_save_see_summary(self, browser):
-        fio, phone = f'111_EDITED_{self.performer_fio}', str(int(time.time()))[:10]
+        fio, phone = f'!000_EDITED_{self.performer_fio}', str(int(time.time()))[:10]
 
         self.page.go_to_detailed_info()
         self.page.edit_performer(fio=fio, phone=phone)
@@ -122,7 +112,7 @@ class TestOrderCreation:
         self.page.check_performer_info(expected_fio=fio, expected_phone=expected_phone)
 
     def test_edit_and_save_see_draft(self, browser):
-        fio, birthyear = f'111_EDITED_{self.performer_fio}', '2002',
+        fio, birthyear = f'!000_EDITED_{self.performer_fio}', '2002',
         passport, phone = "1111 222222", str(int(time.time()))[:10]
 
         self.page.go_to_detailed_info()
@@ -136,18 +126,17 @@ class TestOrderCreation:
         self.page.close_drawer()
 
     def test_edit_and_not_save_see_summary(self, browser):
-        fio, phone = f'111_EDITED_{self.performer_fio}', str(int(time.time()))[:10]
+        fio, phone = f'!000_EDITED_{self.performer_fio}', str(int(time.time()))[:10]
 
         self.page.go_to_detailed_info()
         self.page.edit_performer(fio=fio, phone=phone)
         self.page.close_drawer()  # просто закрываем, не сохраняем!
 
         # поэтому сверяем со старыми данными (дефолтными)
-        expected_phone = f'+7 {self.phone[:3]} {self.phone[3:6]} {self.phone[6:8]} {self.phone[8:]}'
-        self.page.check_performer_info(expected_fio=self.performer_fio, expected_phone=expected_phone)
+        self.page.check_performer_info(expected_fio=self.performer_fio, expected_phone=self.phone)
 
     def test_edit_and_not_save_see_draft(self, browser):
-        fio, birthyear = f'111_EDITED_{self.performer_fio}', '2002',
+        fio, birthyear = f'!000_EDITED_{self.performer_fio}', '2002',
         passport, phone = "1111 222222", str(int(time.time()))[:10]
 
         self.page.go_to_detailed_info()
@@ -155,11 +144,9 @@ class TestOrderCreation:
         self.page.close_drawer()  # просто закрываем, не сохраняем!
 
         # поэтому сверяем со старыми данными (дефолтными)
-        expected_phone = f'+7 {self.phone[:3]} {self.phone[3:6]} {self.phone[6:8]} {self.phone[8:]}'
-        expected_passport = f'{self.passport[:4]} {self.passport[4:]}'
         self.page.go_to_detailed_info()
         self.page.check_performer_detailed_info(expected_fio=self.performer_fio, expected_birthyear=self.birthyear,
-                                                expected_passport=expected_passport, expected_phone=expected_phone)
+                                                expected_passport=self.passport, expected_phone=self.phone)
         self.page.close_drawer()
 
     def test_performer_should_be_selected_if_no_inn_and_no_bank_card(self, browser):
@@ -187,12 +174,11 @@ class TestOrderCreation:
 
         self.page.check_performer_selection(True)
 
-    @pytest.mark.fast
     def test_performer_should_not_be_selected_if_inn_and_bank_card(self, browser):
         self.page.go_to_blacklist()
         self.page.blacklist()
 
-        phone = str(int(time.time()) + 2)[:10]
+        phone = str(int(time.time()))[:10]
         self.page.go_to_add_performer()
         self.page.add_performer(self.performer_fio, self.birthyear, self.passport, phone, inn=self.inn,
                                 bank_card=self.bank_card)
@@ -200,35 +186,78 @@ class TestOrderCreation:
         self.page.check_performer_selection(False)
 
 
-# @pytest.mark.order_element
-# @pytest.mark.order_element_basis
-class TestOrderElementBasis:
+@pytest.mark.performer
+@pytest.mark.performer_blacklist
+class TestPerformerBlacklist:
     @pytest.fixture(scope='function', autouse=True)
     def setup(self, browser):
         page = AuthPage(browser, main_link)
         page.open()
         page.should_be_auth_page()
-        email = os.getenv('SPRING_ADMIN_MAIL')
-        password = os.getenv('SPRING_ADMIN_PASSWORD')
-        page.auth(email, password)
+        login = os.getenv('DKRS_ADMIN_LOGIN')
+        password = os.getenv('DKRS_ADMIN_PASSWORD')
+        page.auth(login, password)
 
-        self.page = OrderPage(browser, main_link)
+        self.page = PerformerPage(browser, main_link)
 
-        self.page.should_be_create_order_button()
-        self.order_number = f'AUTOTEST_{int(time.time())}'
-        self.page.go_to_create_order()
-        time.sleep(.5)
-        self.page.create_order(self.order_number)
+        self.page.should_be_add_performer_button()
+        self.performer_fio = f'!000_AUTOTEST_11{2_000_000_000 - int(time.time())}'
+        self.birthyear = '1996'
+        self.raw_passport = '3697123456'
+        self.passport = f'{self.raw_passport[:4]} {self.raw_passport[4:]}'
+        self.raw_phone = str(int(time.time()))[:10]
+        self.phone = f'+7 {self.raw_phone[:3]} {self.raw_phone[3:6]} {self.raw_phone[6:8]} {self.raw_phone[8:]}'
+        self.inn = '8383838383838383838'
+        self.bank_card = '5454545454545454'
+        self.page.go_to_add_performer()
+
+        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, self.phone)
         time.sleep(1)
+        yield
+        try:
+            if self.page.get_current_tab() == PerformerPage.ACTIVE_TAB:
+                self.page.go_to_blacklist()
+                self.page.blacklist()
+        except Exception as e:
+            print('>> ERROR!: Failed blacklisting the performer.')
+            print(f'>> Reason: {e}')
+            print(f'>> Blacklist the performer with this FIO: {self.performer_fio}')
 
-    def test_can_add_element(self, browser):
-        self.page.should_be_order_draft()
+    def test_can_open_blacklist_tab(self, browser):
+        self.page.go_to_removed_tab()
 
-    def test_can_see_element_creation(self, browser):
-        self.page.should_be_order_draft()
-        self.page.go_to_create_element()
-        self.page.should_be_element_creation()
+    def test_can_blacklist_person(self, browser):
+        self.page.go_to_blacklist()
+        self.page.blacklist()
 
+    def test_check_blacklisted_person_info(self, browser):
+        self.page.go_to_blacklist()
+        self.page.blacklist()
+        self.page.go_to_removed_tab()
+        self.page.check_performer_info(self.performer_fio, self.phone)
+
+    def test_check_blacklisted_person_detailed_info(self, browser):
+        comment = str(int(time.time()))
+        self.page.go_to_blacklist()
+        self.page.blacklist(str(int(time.time())))
+        self.page.go_to_removed_tab()
+        self.page.go_to_detailed_info()
+        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone,
+                                                expected_status='В черном списке',
+                                                expected_comment=comment)
+
+    @pytest.mark.fast
+    def test_check_blacklist_comment(self, browser):
+        comment = 'This is a test comment made by auto-test!'
+
+        self.page.go_to_blacklist()
+        self.page.blacklist(comment)
+        self.page.go_to_removed_tab()
+        self.page.go_to_detailed_info()
+        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone,
+                                                expected_status='В черном списке', expected_comment=comment)
+
+    # АТЕНШОН! Далее шаблонные (нерабочие) тесты
     def test_cant_see_element_creation(self, browser):
         self.page.should_be_order_draft()
         self.page.browser.implicitly_wait(0)
