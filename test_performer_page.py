@@ -73,7 +73,7 @@ class TestPerformerCreation:
             self.page.go_to_blacklist()
             self.page.blacklist()
         except Exception as e:
-            print('>> ERROR!: Failed blacklisting the performer.')
+            print('\n>> ERROR!: Failed blacklisting the performer.')
             print(f'>> Reason: {e}')
             print(f'>> Blacklist the performer with this FIO: {self.performer_fio}')
 
@@ -219,7 +219,7 @@ class TestPerformerBlacklist:
                 self.page.go_to_blacklist()
                 self.page.blacklist()
         except Exception as e:
-            print('>> ERROR!: Failed blacklisting the performer.')
+            print('\n>> ERROR!: Failed blacklisting the performer.')
             print(f'>> Reason: {e}')
             print(f'>> Blacklist the performer with this FIO: {self.performer_fio}')
 
