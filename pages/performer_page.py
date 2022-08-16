@@ -3,10 +3,13 @@ import datetime as dt
 from selenium.webdriver.common.keys import Keys
 
 from .person_page import PersonPage
-from .locators import PerformerPageLocators
+from .locators import PersonPageLocators, PerformerPageLocators
 
 
 class PerformerPage(PersonPage):
+    ACTIVE_STATUS = 'Активен'
+    BLACKLIST_STATUS = 'В черном списке'
+
     def should_be_add_performer_button(self):
         assert self.is_element_present(*PerformerPageLocators.ADD_PERFORMER_BTN), \
             'Add performer button is not presented'
@@ -15,17 +18,17 @@ class PerformerPage(PersonPage):
         self.browser.find_element(*PerformerPageLocators.ADD_PERFORMER_BTN).click()
 
     def should_be_performer_creation(self):
-        for key, val in PerformerPageLocators.PERFORMER_CREATION.items():
-            assert self.is_element_present(*val), f'{key} is not presented'
+        for elem_name, elem_path in PerformerPageLocators.PERFORMER_CREATION.items():
+            assert self.is_element_present(*elem_path), f'{elem_name} is not presented'
 
     def should_not_be_performer_creation(self, action: str):
         match action:
             case PersonPage.NOT_PRESENT:
-                for key, val in PerformerPageLocators.PERFORMER_CREATION.items():
-                    assert self.is_not_element_present(*val), f'{key} is presented, but it shouldn\'t be'
+                for elem_name, elem_path in PerformerPageLocators.PERFORMER_CREATION.items():
+                    assert self.is_not_element_present(*elem_path), f'{elem_name} is presented, but it shouldn\'t be'
             case PersonPage.DISAPPEAR:
-                for key, val in PerformerPageLocators.PERFORMER_CREATION.items():
-                    assert self.is_disappeared(*val), f'{key} is presented, but it should disappear'
+                for elem_name, elem_path in PerformerPageLocators.PERFORMER_CREATION.items():
+                    assert self.is_disappeared(*elem_path), f'{elem_name} is presented, but it should disappear'
 
     def add_performer(self,
                       fio: str,
@@ -78,17 +81,17 @@ class PerformerPage(PersonPage):
                                                f'expected: {expected_phone}'
 
     def should_be_performer_detailed_info(self):
-        for key, val in PerformerPageLocators.PERFORMER_DETAILED_INFO.items():
-            assert self.is_element_present(*val), f'{key} is not presented'
+        for elem_name, elem_path in PerformerPageLocators.PERFORMER_DETAILED_INFO.items():
+            assert self.is_element_present(*elem_path), f'{elem_name} is not presented'
 
     def should_not_be_performer_detailed_info(self, action: str):
         match action:
             case PersonPage.NOT_PRESENT:
-                for key, val in PerformerPageLocators.PERFORMER_DETAILED_INFO.items():
-                    assert self.is_not_element_present(*val), f'{key} is presented, but it shouldn\'t be'
+                for elem_name, elem_path in PerformerPageLocators.PERFORMER_DETAILED_INFO.items():
+                    assert self.is_not_element_present(*elem_path), f'{elem_name} is presented, but it shouldn\'t be'
             case PersonPage.DISAPPEAR:
-                for key, val in PerformerPageLocators.PERFORMER_DETAILED_INFO.items():
-                    assert self.is_disappeared(*val), f'{key} is presented, but it should disappear'
+                for elem_name, elem_path in PerformerPageLocators.PERFORMER_DETAILED_INFO.items():
+                    assert self.is_disappeared(*elem_path), f'{elem_name} is presented, but it should disappear'
 
     def check_performer_detailed_info(self,
                                       expected_fio: str,
@@ -98,7 +101,7 @@ class PerformerPage(PersonPage):
                                       expected_id: str = None,
                                       expected_inn: str = None,
                                       expected_bankcard: str = None,
-                                      expected_status: str = 'Активен',
+                                      expected_status: str = ACTIVE_STATUS,
                                       expected_comment: str = ''):
         expected_id = expected_id if expected_id else '<EMPTY>'
         expected_fio = expected_fio if expected_fio else '<EMPTY>'
@@ -204,8 +207,19 @@ class PerformerPage(PersonPage):
             entry.send_keys(Keys.CONTROL + "a")
             entry.send_keys(bank_card)
 
+    def scroll_down(self):
+        self.browser.execute_script("return arguments[0].scrollIntoView(true);",
+                                    self.browser.find_element(*PerformerPageLocators
+                                                              .PERFORMER_DETAILED_INFO_BANKCARD_INPUT))
+
     def save_performer(self):
-        self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_SAVE_BTN).click()
+        self.scroll_down()
+        status = self.browser.find_element(*PerformerPageLocators
+                                           .PERFORMER_DETAILED_INFO_STATUS_INPUT).get_property('value')
+        if status == PerformerPage.BLACKLIST_STATUS:
+            self.browser.find_element(*PerformerPageLocators.PERFORMER_BL_DETAILED_INFO_SAVE_BTN).click()
+        else:
+            self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_SAVE_BTN).click()
         time.sleep(1)
 
     def check_performer_selection(self, expected_result: bool):
@@ -214,9 +228,43 @@ class PerformerPage(PersonPage):
         assert actual_result == expected_result, f'Performer selection, actual result: {actual_result}, ' \
                                                  f'expected: {expected_result}'
 
+    def change_performer_status(self, status: str, comment: str = f'CHANGED_STATUS_{str(int(time.time()))}'):
+        self.scroll_down()
+        self.browser.find_element(*PerformerPageLocators.PERFORMER_DETAILED_INFO_STATUS_INPUT).click()
+        dropdown_content_spans = self.browser.find_elements(*PersonPageLocators.DROPDOWN_CONTENT_SPAN)
+        for i in range(len(dropdown_content_spans)):
+            if dropdown_content_spans[i].get_attribute("innerHTML") == status:
+                self.browser.find_elements(*PersonPageLocators.DROPDOWN_CONTENT)[i].click()
+                break
+        else:
+            raise AssertionError(f'Cannot find "{status}" status')
+        time.sleep(1)
+        if status == PerformerPage.BLACKLIST_STATUS:
+            self.scroll_down()
+            self.browser.find_element(*PerformerPageLocators.PERFORMER_BL_DETAILED_INFO_COMMENT_INPUT)\
+                .send_keys(comment)
+
     def go_to_blacklist(self):
-        self.browser.find_element(*PerformerPageLocators.PERFORMER_ADD_TO_BLACKLIST_BTN).click()
+        if self.get_current_tab() == PerformerPage.ACTIVE_TAB:
+            self.browser.find_element(*PerformerPageLocators.PERFORMER_ADD_TO_BLACKLIST_BTN).click()
+        else:
+            raise Exception('Not an active tab so can\'t go to blacklist')
 
     def blacklist(self, comment: str = str(int(time.time()))):
         self.browser.find_element(*PerformerPageLocators.PERFORMER_BL_COMMENT_INPUT).send_keys(comment)
         self.browser.find_element(*PerformerPageLocators.PERFORMER_BL_CONFIRM_BTN).click()
+
+    def cancel_blacklist(self):
+        self.browser.find_element(*PerformerPageLocators.PERFORMER_BL_CANCEL_BTN).click()
+
+    def go_to_unblacklist(self):
+        if self.get_current_tab() == PerformerPage.REMOVED_TAB:
+            self.browser.find_element(*PerformerPageLocators.PERFORMER_ADD_TO_BLACKLIST_BTN).click()
+        else:
+            raise Exception('Not a blacklist tab so can\'t go to unblacklist')
+
+    def unblacklist(self):
+        self.browser.find_element(*PerformerPageLocators.PERFORMER_UNBL_CONFIRM_BTN).click()
+
+    def cancel_unblacklist(self):
+        self.browser.find_element(*PerformerPageLocators.PERFORMER_UNBL_CANCEL_BTN).click()
