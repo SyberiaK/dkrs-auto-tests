@@ -24,6 +24,9 @@ class PersonPageLocators:
     DIALOG_CLOSE_BTN = By.CSS_SELECTOR, 'button.el-dialog__headerbtn'
     MSGBOX_CLOSE_BTN = By.CSS_SELECTOR, 'button.el-message-box__headerbtn'
 
+    DROPDOWN_CONTENT = By.XPATH, '//div[@aria-hidden="false"]//li'
+    DROPDOWN_CONTENT_SPAN = By.XPATH, '//div[@aria-hidden="false"]//li/span'
+
 
 class PerformerPageLocators:
     ADD_PERFORMER_BTN = By.XPATH, '//button[@class="el-button el-button--primary"]'
@@ -81,7 +84,10 @@ class PerformerPageLocators:
 
     PERFORMER_BL_COMMENT_INPUT = By.CSS_SELECTOR, 'input.el-input__inner'
     PERFORMER_BL_CONFIRM_BTN = By.CSS_SELECTOR, '.el-message-box__btns button.btn-next'
-    PERFORMER_BL_CANCEL_BTN = By.CSS_SELECTOR, '.el-message-box__btns button.el-button--default'
+    PERFORMER_BL_CANCEL_BTN = PERFORMER_UNBL_CANCEL_BTN = By.CSS_SELECTOR, '.el-message-box__btns ' \
+                                                                           'button.el-button--default'
+
+    PERFORMER_UNBL_CONFIRM_BTN = By.CSS_SELECTOR, '.el-message-box__btns button.prompt-primary-btn'
 
 
 # Все локаторы ниже не используются в коде и подлежат удалению.
