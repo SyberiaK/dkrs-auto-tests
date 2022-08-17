@@ -61,7 +61,7 @@ class TestPerformerCreation:
         self.page = PerformerPage(browser, main_link)
 
         self.page.should_be_add_performer_button()
-        self.performer_fio = f'!000_AUTOTEST_11{2_000_000_000 - int(time.time())}'
+        self.fio = f'!000_AUTOTEST_11{2_000_000_000 - int(time.time())}'
         self.birthyear = '1996'
         self.raw_passport = '3697123456'
         self.passport = f'{self.raw_passport[:4]} {self.raw_passport[4:]}'
@@ -71,14 +71,14 @@ class TestPerformerCreation:
         self.bank_card = '5454545454545454'
         self.page.go_to_add_performer()
 
-        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, self.phone)
+        self.page.add_performer(self.fio, self.birthyear, self.passport, self.phone)
         time.sleep(1)
         yield
         try:
             self.page.go_to_blacklist()
             self.page.blacklist()
         except Exception as e:
-            blacklist_fail(e, self.performer_fio)
+            blacklist_fail(e, self.fio)
 
     def test_cant_see_performer_creation_after_creation(self, browser):
         self.page.browser.implicitly_wait(0)
@@ -90,7 +90,7 @@ class TestPerformerCreation:
         self.page.should_not_be_performer_detailed_info(PerformerPage.NOT_PRESENT)
 
     def test_expected_performer_info_equals_actual(self, browser):
-        self.page.check_performer_info(self.performer_fio, self.phone)
+        self.page.check_performer_info(self.fio, self.phone)
 
     def test_can_see_and_close_performer_detailed_info(self, browser):
         self.page.go_to_detailed_info()
@@ -101,11 +101,11 @@ class TestPerformerCreation:
 
     def test_expected_performer_detailed_info_equals_actual(self, browser):
         self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone)
+        self.page.check_performer_detailed_info(self.fio, self.birthyear, self.passport, self.phone)
         self.page.close_drawer()
 
     def test_edit_and_save_see_summary(self, browser):
-        fio, phone = f'!000_EDITED_{self.performer_fio}', str(int(time.time()))[:10]
+        fio, phone = f'!000_EDITED_{self.fio}', str(int(time.time()))[:10]
 
         self.page.go_to_detailed_info()
         self.page.edit_performer(fio=fio, phone=phone)
@@ -115,7 +115,7 @@ class TestPerformerCreation:
         self.page.check_performer_info(expected_fio=fio, expected_phone=expected_phone)
 
     def test_edit_and_save_see_draft(self, browser):
-        fio, birthyear = f'!000_EDITED_{self.performer_fio}', '2002',
+        fio, birthyear = f'!000_EDITED_{self.fio}', '2002',
         passport, phone = "1111 222222", str(int(time.time()))[:10]
 
         self.page.go_to_detailed_info()
@@ -129,17 +129,17 @@ class TestPerformerCreation:
         self.page.close_drawer()
 
     def test_edit_and_not_save_see_summary(self, browser):
-        fio, phone = f'!000_EDITED_{self.performer_fio}', str(int(time.time()))[:10]
+        fio, phone = f'!000_EDITED_{self.fio}', str(int(time.time()))[:10]
 
         self.page.go_to_detailed_info()
         self.page.edit_performer(fio=fio, phone=phone)
         self.page.close_drawer()  # просто закрываем, не сохраняем!
 
         # поэтому сверяем со старыми данными (дефолтными)
-        self.page.check_performer_info(expected_fio=self.performer_fio, expected_phone=self.phone)
+        self.page.check_performer_info(expected_fio=self.fio, expected_phone=self.phone)
 
     def test_edit_and_not_save_see_draft(self, browser):
-        fio, birthyear = f'!000_EDITED_{self.performer_fio}', '2002',
+        fio, birthyear = f'!000_EDITED_{self.fio}', '2002',
         passport, phone = "1111 222222", str(int(time.time()))[:10]
 
         self.page.go_to_detailed_info()
@@ -148,7 +148,7 @@ class TestPerformerCreation:
 
         # поэтому сверяем со старыми данными (дефолтными)
         self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(expected_fio=self.performer_fio, expected_birthyear=self.birthyear,
+        self.page.check_performer_detailed_info(expected_fio=self.fio, expected_birthyear=self.birthyear,
                                                 expected_passport=self.passport, expected_phone=self.phone)
         self.page.close_drawer()
 
@@ -163,7 +163,7 @@ class TestPerformerCreation:
 
         phone = str(int(time.time()))[:10]
         self.page.go_to_add_performer()
-        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, phone, inn=self.inn)
+        self.page.add_performer(self.fio, self.birthyear, self.passport, phone, inn=self.inn)
 
         self.page.check_performer_selection(True)
 
@@ -173,7 +173,7 @@ class TestPerformerCreation:
 
         phone = str(int(time.time()))[:10]
         self.page.go_to_add_performer()
-        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, phone, bank_card=self.bank_card)
+        self.page.add_performer(self.fio, self.birthyear, self.passport, phone, bank_card=self.bank_card)
 
         self.page.check_performer_selection(True)
 
@@ -183,7 +183,7 @@ class TestPerformerCreation:
 
         phone = str(int(time.time()))[:10]
         self.page.go_to_add_performer()
-        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, phone, inn=self.inn,
+        self.page.add_performer(self.fio, self.birthyear, self.passport, phone, inn=self.inn,
                                 bank_card=self.bank_card)
 
         self.page.check_performer_selection(False)
@@ -204,7 +204,7 @@ class TestPerformerBlacklist:
         self.page = PerformerPage(browser, main_link)
 
         self.page.should_be_add_performer_button()
-        self.performer_fio = f'!000_AUTOTEST_11{2_000_000_000 - int(time.time())}'
+        self.fio = f'!000_AUTOTEST_11{2_000_000_000 - int(time.time())}'
         self.birthyear = '1996'
         self.raw_passport = '3697123456'
         self.passport = f'{self.raw_passport[:4]} {self.raw_passport[4:]}'
@@ -214,7 +214,7 @@ class TestPerformerBlacklist:
         self.bank_card = '5454545454545454'
         self.page.go_to_add_performer()
 
-        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, self.phone)
+        self.page.add_performer(self.fio, self.birthyear, self.passport, self.phone)
         time.sleep(1)
         yield
         try:
@@ -222,7 +222,7 @@ class TestPerformerBlacklist:
                 self.page.go_to_blacklist()
                 self.page.blacklist()
         except Exception as e:
-            blacklist_fail(e, self.performer_fio)
+            blacklist_fail(e, self.fio)
 
     def test_can_open_blacklist_tab(self, browser):
         self.page.go_to_removed_tab()
@@ -234,13 +234,13 @@ class TestPerformerBlacklist:
     def test_can_cancel_blacklist(self, browser):
         self.page.go_to_blacklist()
         self.page.cancel_blacklist()
-        self.page.check_performer_info(self.performer_fio, self.phone)
+        self.page.check_performer_info(self.fio, self.phone)
 
     def test_check_blacklisted_person_info(self, browser):
         self.page.go_to_blacklist()
         self.page.blacklist()
         self.page.go_to_removed_tab()
-        self.page.check_performer_info(self.performer_fio, self.phone)
+        self.page.check_performer_info(self.fio, self.phone)
 
     def test_check_blacklisted_person_detailed_info(self, browser):
         comment = str(int(time.time()))
@@ -248,7 +248,7 @@ class TestPerformerBlacklist:
         self.page.blacklist(str(int(time.time())))
         self.page.go_to_removed_tab()
         self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone,
+        self.page.check_performer_detailed_info(self.fio, self.birthyear, self.passport, self.phone,
                                                 expected_status=PerformerPage.BLACKLIST_STATUS,
                                                 expected_comment=comment)
 
@@ -259,7 +259,7 @@ class TestPerformerBlacklist:
         self.page.blacklist(comment)
         self.page.go_to_removed_tab()
         self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone,
+        self.page.check_performer_detailed_info(self.fio, self.birthyear, self.passport, self.phone,
                                                 expected_status=PerformerPage.BLACKLIST_STATUS,
                                                 expected_comment=comment)
 
@@ -271,9 +271,9 @@ class TestPerformerBlacklist:
         self.page.save_performer()
 
         self.page.go_to_removed_tab()
-        self.page.check_performer_info(self.performer_fio, self.phone)
+        self.page.check_performer_info(self.fio, self.phone)
         self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone,
+        self.page.check_performer_detailed_info(self.fio, self.birthyear, self.passport, self.phone,
                                                 expected_status=PerformerPage.BLACKLIST_STATUS,
                                                 expected_comment=comment)
 
@@ -285,9 +285,9 @@ class TestPerformerBlacklist:
         self.page.close_drawer()  # просто закрываем, не сохраняем!
 
         # self.page.go_to_removed_tab()  # поэтому лицо должно остаться в списке активных
-        self.page.check_performer_info(self.performer_fio, self.phone)
+        self.page.check_performer_info(self.fio, self.phone)
         self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone)
+        self.page.check_performer_detailed_info(self.fio, self.birthyear, self.passport, self.phone)
         self.page.close_drawer()
 
     def test_can_unblacklist_person(self, browser):
@@ -297,7 +297,7 @@ class TestPerformerBlacklist:
         self.page.go_to_unblacklist()
         self.page.unblacklist()
         self.page.go_to_active_tab()
-        self.page.check_performer_info(self.performer_fio, self.phone)
+        self.page.check_performer_info(self.fio, self.phone)
         self.page.close_drawer()
 
     def test_can_cancel_unblacklist_person(self, browser):
@@ -306,7 +306,7 @@ class TestPerformerBlacklist:
         self.page.go_to_removed_tab()
         self.page.go_to_unblacklist()
         self.page.cancel_unblacklist()
-        self.page.check_performer_info(self.performer_fio, self.phone)
+        self.page.check_performer_info(self.fio, self.phone)
 
     def test_can_unblacklist_through_detailed_info_and_save(self, browser):
         comment = 'This is a test comment made by auto-test! Commented in detailed info!'
@@ -321,9 +321,9 @@ class TestPerformerBlacklist:
         self.page.save_performer()
 
         self.page.go_to_active_tab()
-        self.page.check_performer_info(self.performer_fio, self.phone)
+        self.page.check_performer_info(self.fio, self.phone)
         self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone)
+        self.page.check_performer_detailed_info(self.fio, self.birthyear, self.passport, self.phone)
 
     def test_can_unblacklist_through_detailed_info_and_not_save(self, browser):
         comment = 'This is a test comment made by auto-test! Commented in detailed info!'
@@ -338,8 +338,8 @@ class TestPerformerBlacklist:
         self.page.close_drawer()  # просто закрываем, не сохраняем!
 
         # self.page.go_to_active_tab()  # поэтому лицо должно остаться в чёрном списке
-        self.page.check_performer_info(self.performer_fio, self.phone)
+        self.page.check_performer_info(self.fio, self.phone)
         self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone,
+        self.page.check_performer_detailed_info(self.fio, self.birthyear, self.passport, self.phone,
                                                 expected_status=PerformerPage.BLACKLIST_STATUS,
                                                 expected_comment=comment)
