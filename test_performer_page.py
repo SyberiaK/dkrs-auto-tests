@@ -227,6 +227,15 @@ class TestPerformerBlacklist:
     def test_can_open_blacklist_tab(self, browser):
         self.page.go_to_removed_tab()
 
+    def test_can_open_blacklist_msgbox(self, browser):
+        self.page.go_to_blacklist()
+        self.page.should_be_performer_blacklist()
+
+    def test_can_close_blacklist_msgbox(self, browser):
+        self.page.go_to_blacklist()
+        self.page.close_msgbox()
+        self.page.should_not_be_performer_blacklist(PerformerPage.DISAPPEAR)
+
     def test_can_blacklist_person(self, browser):
         self.page.go_to_blacklist()
         self.page.blacklist()
@@ -290,6 +299,21 @@ class TestPerformerBlacklist:
         self.page.check_performer_detailed_info(self.fio, self.birthyear, self.passport, self.phone)
         self.page.close_drawer()
 
+    def test_can_open_unblacklist_msgbox(self, browser):
+        self.page.go_to_blacklist()
+        self.page.blacklist()
+        self.page.go_to_removed_tab()
+        self.page.go_to_unblacklist()
+        self.page.should_be_performer_unblacklist()
+
+    def test_can_close_unblacklist_msgbox(self, browser):
+        self.page.go_to_blacklist()
+        self.page.blacklist()
+        self.page.go_to_removed_tab()
+        self.page.go_to_unblacklist()
+        self.page.close_msgbox()
+        self.page.should_not_be_performer_unblacklist(PerformerPage.DISAPPEAR)
+
     def test_can_unblacklist_person(self, browser):
         self.page.go_to_blacklist()
         self.page.blacklist()
@@ -298,7 +322,6 @@ class TestPerformerBlacklist:
         self.page.unblacklist()
         self.page.go_to_active_tab()
         self.page.check_performer_info(self.fio, self.phone)
-        self.page.close_drawer()
 
     def test_can_cancel_unblacklist_person(self, browser):
         self.page.go_to_blacklist()
