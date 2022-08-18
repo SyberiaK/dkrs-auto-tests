@@ -31,6 +31,14 @@ class PersonPage(BasePage):
         self.browser.find_element(*PersonPageLocators.DRAWER_CLOSE_BTN).click()
         time.sleep(1)
 
+    def close_dialog(self):
+        self.browser.find_element(*PersonPageLocators.DIALOG_CLOSE_BTN).click()
+        time.sleep(1)
+
+    def close_msgbox(self):
+        self.browser.find_element(*PersonPageLocators.MSGBOX_CLOSE_BTN).click()
+        time.sleep(1)
+
     '''def cancel(self,
                dec: str):
         if dec == 'cancel':

@@ -250,6 +250,19 @@ class PerformerPage(PersonPage):
         else:
             raise Exception('Not an active tab so can\'t go to blacklist')
 
+    def should_be_performer_blacklist(self):
+        for elem_name, elem_path in PerformerPageLocators.PERFORMER_BL.items():
+            assert self.is_element_present(*elem_path), f'{elem_name} is not presented'
+
+    def should_not_be_performer_blacklist(self, action: str):
+        match action:
+            case PersonPage.NOT_PRESENT:
+                for elem_name, elem_path in PerformerPageLocators.PERFORMER_BL.items():
+                    assert self.is_not_element_present(*elem_path), f'{elem_name} is presented, but it shouldn\'t be'
+            case PersonPage.DISAPPEAR:
+                for elem_name, elem_path in PerformerPageLocators.PERFORMER_BL.items():
+                    assert self.is_disappeared(*elem_path), f'{elem_name} is presented, but it should disappear'
+
     def blacklist(self, comment: str = str(int(time.time()))):
         self.browser.find_element(*PerformerPageLocators.PERFORMER_BL_COMMENT_INPUT).send_keys(comment)
         self.browser.find_element(*PerformerPageLocators.PERFORMER_BL_CONFIRM_BTN).click()
@@ -262,6 +275,19 @@ class PerformerPage(PersonPage):
             self.browser.find_element(*PerformerPageLocators.PERFORMER_ADD_TO_BLACKLIST_BTN).click()
         else:
             raise Exception('Not a blacklist tab so can\'t go to unblacklist')
+
+    def should_be_performer_unblacklist(self):
+        for elem_name, elem_path in PerformerPageLocators.PERFORMER_UNBL.items():
+            assert self.is_element_present(*elem_path), f'{elem_name} is not presented'
+
+    def should_not_be_performer_unblacklist(self, action: str):
+        match action:
+            case PersonPage.NOT_PRESENT:
+                for elem_name, elem_path in PerformerPageLocators.PERFORMER_UNBL.items():
+                    assert self.is_not_element_present(*elem_path), f'{elem_name} is presented, but it shouldn\'t be'
+            case PersonPage.DISAPPEAR:
+                for elem_name, elem_path in PerformerPageLocators.PERFORMER_UNBL.items():
+                    assert self.is_disappeared(*elem_path), f'{elem_name} is presented, but it should disappear'
 
     def unblacklist(self):
         self.browser.find_element(*PerformerPageLocators.PERFORMER_UNBL_CONFIRM_BTN).click()
