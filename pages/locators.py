@@ -89,6 +89,13 @@ class PerformerPageLocators:
 
     PERFORMER_UNBL_CONFIRM_BTN = By.CSS_SELECTOR, '.el-message-box__btns button.prompt-primary-btn'
 
+    PERFORMER_BL = {'Blacklist comment input': PERFORMER_BL_COMMENT_INPUT,
+                    'Confirm blacklist button': PERFORMER_BL_CONFIRM_BTN,
+                    'Cancel blacklist button': PERFORMER_BL_CANCEL_BTN}
+
+    PERFORMER_UNBL = {'Confirm unblacklist button': PERFORMER_UNBL_CONFIRM_BTN,
+                      'Cancel unblacklist button': PERFORMER_UNBL_CANCEL_BTN}
+
 
 class ResponsiblePageLocators:
     ADD_RESPONSIBLE_BTN = By.XPATH, '//button[@class="el-button el-button--primary"]'
@@ -111,14 +118,15 @@ class ResponsiblePageLocators:
     RESPONSIBLE_INFO_FIO = By.XPATH, '//tbody/tr[1]/td[1]//span/span'
     RESPONSIBLE_INFO_EMAIL = By.XPATH, '//tbody/tr[1]/td[2]//span/span'
     RESPONSIBLE_INFO_PHONE = By.XPATH, '//tbody/tr[1]/td[3]//span/span'
-    RESPONSIBLE_INFO_OBJECTS = By.XPATH, '//tbody/tr[1]/td[4]//span/span//span[3]'
+    RESPONSIBLE_INFO_OBJECT = By.XPATH, '//tbody/tr[1]/td[4]//span/span//span[1]'
+    RESPONSIBLE_INFO_SERVICES = By.XPATH, '//tbody/tr[1]/td[4]//span/span//span[3]'
     RESPONSIBLE_ADD_TO_ARCHIVE_BTN = PERFORMER_RETURN_FROM_ARCHIVE_BTN = By.XPATH, '//tbody/tr[1]/td[5]/div/div'
 
     RESPONSIBLE_DETAILED_INFO_FIO_INPUT = By.XPATH, '//form[@class="el-form"]/div[1]//input'
     RESPONSIBLE_DETAILED_INFO_EMAIL_INPUT = By.XPATH, '//form[@class="el-form"]/div[2]//input'
     RESPONSIBLE_DETAILED_INFO_PHONE_INPUT = By.XPATH, '//form[@class="el-form"]/div[3]//input'
-    RESPONSIBLE_DETAILED_INFO_OBJECTS_CHECKBOXES = By.XPATH, '//form[@class="el-form"]/div[4]//' \
-                                                             'span[contains(@class, "el-checkbox__input")]'
+    RESPONSIBLE_DETAILED_INFO_OBJECTS_N_SERVICES_CHECKBOXES = By.XPATH, '//form[@class="el-form"]/div[4]//' \
+                                                                        'span[contains(@class, "el-checkbox__input")]'
     RESPONSIBLE_DETAILED_INFO_SAVE_BTN = By.XPATH, '//form[@class="el-form"]/div[5]//button'
     RESPONSIBLE_DETAILED_INFO_CHANGEPASS_BTN = By.XPATH, '//button[contains(@class, "btn-change-pass")]'
 
@@ -126,13 +134,23 @@ class ResponsiblePageLocators:
                                  'Responsible email input in detailed info': RESPONSIBLE_DETAILED_INFO_EMAIL_INPUT,
                                  'Responsible phone input in detailed info': RESPONSIBLE_DETAILED_INFO_PHONE_INPUT,
                                  'Responsible objects checkboxes in detailed info':
-                                     RESPONSIBLE_DETAILED_INFO_OBJECTS_CHECKBOXES,
+                                     RESPONSIBLE_DETAILED_INFO_OBJECTS_N_SERVICES_CHECKBOXES,
                                  'Save responsible button in detailed info': RESPONSIBLE_DETAILED_INFO_SAVE_BTN,
                                  'Change responsible password button in detailed info':
                                      RESPONSIBLE_DETAILED_INFO_CHANGEPASS_BTN}
 
+    RESPONSIBLE_CHANGEPASS_NEWPASS_INPUT = By.XPATH, '//div[@class="el-dialog__body"]/div[2]/input'
+    RESPONSIBLE_CHANGEPASS_CONFIRMPASS_INPUT = By.XPATH, '//div[@class="el-dialog__body"]/div[4]/input'
+    RESPONSIBLE_CHANGEPASS_CONFIRM_BTN = By.CSS_SELECTOR, '.el-dialog__footer button.el-button--primary'
+    RESPONSIBLE_CHANGEPASS_CANCEL_BTN = By.CSS_SELECTOR, '.el-dialog__footer button.el-button--default'
+
+    RESPONSIBLE_CHANGEPASS = {'New password input': RESPONSIBLE_CHANGEPASS_NEWPASS_INPUT,
+                              'Confirm password input': RESPONSIBLE_CHANGEPASS_CONFIRMPASS_INPUT,
+                              'Confirm change password button': RESPONSIBLE_CHANGEPASS_CONFIRM_BTN,
+                              'Cancel change password button': RESPONSIBLE_CHANGEPASS_CANCEL_BTN}
+
     RESPONSIBLE_AR_CONFIRM_BTN = RESPONSIBLE_UNAR_CONFIRM_BTN = By.CSS_SELECTOR, '.el-message-box__btns ' \
-                                                                          'button.prompt-primary-btn'
+                                                                                 'button.prompt-primary-btn'
     RESPONSIBLE_AR_CANCEL_BTN = RESPONSIBLE_UNAR_CANCEL_BTN = By.CSS_SELECTOR, '.el-message-box__btns ' \
                                                                                'button.el-button--default'
 
