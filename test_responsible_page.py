@@ -143,7 +143,6 @@ class TestResponsibleCreation:
         # поэтому сверяем со старыми данными (дефолтными)
         self.page.check_responsible_info(self.fio, self.email, self.phone, self.object_n_services)
 
-    @pytest.mark.fast
     def test_edit_and_not_save_see_draft(self, browser):
         fio, email, phone, object_n_services = f'!000_EDITED_{self.fio}', \
                                                f'{str(int(time.time()))[:10]}@edited_autotest.top', \
@@ -163,19 +162,32 @@ class TestResponsibleCreation:
         self.page.go_to_detailed_info()
         self.page.go_to_change_password()
         self.page.should_be_responsible_change_password()
+        self.page.close_dialog()
+        self.page.close_drawer()
 
     def test_can_close_change_password_dialog(self, browser):
         self.page.go_to_detailed_info()
         self.page.go_to_change_password()
         self.page.close_dialog()
         self.page.should_not_be_responsible_change_password(ResponsiblePage.DISAPPEAR)
+        self.page.close_drawer()
 
-# АТЕНШОН! Тесты ниже не работают.
+    def test_can_change_password(self, browser):
+        self.page.go_to_detailed_info()
+        self.page.go_to_change_password()
+        self.page.change_password('EDITED AUTOTEST IS THE BEST')
+        self.page.close_drawer()
+
+    def test_can_cancel_change_password(self, browser):
+        self.page.go_to_detailed_info()
+        self.page.go_to_change_password()
+        self.page.cancel_change_password()
+        self.page.close_drawer()
 
 
-'''@pytest.mark.performer
-@pytest.mark.performer_blacklist
-class TestPerformerBlacklist:
+@pytest.mark.responsible
+@pytest.mark.responsible_archive
+class TestResponsibleArchive:
     @pytest.fixture(scope='function', autouse=True)
     def setup(self, browser):
         page = AuthPage(browser, main_link)
@@ -185,146 +197,112 @@ class TestPerformerBlacklist:
         password = os.getenv('DKRS_ADMIN_PASSWORD')
         page.auth(login, password)
 
-        self.page = PerformerPage(browser, main_link)
+        self.page = ResponsiblePage(browser, main_link)
 
-        self.page.should_be_add_performer_button()
-        self.performer_fio = f'!000_AUTOTEST_11{2_000_000_000 - int(time.time())}'
-        self.birthyear = '1996'
-        self.raw_passport = '3697123456'
-        self.passport = f'{self.raw_passport[:4]} {self.raw_passport[4:]}'
+        self.page.should_be_add_responsible_button()
+        self.fio = f'!000_AUTOTEST_11{2_000_000_000 - int(time.time())}'
+        self.email = f'{2_000_000_000 - int(time.time())}@autotest.top'
         self.raw_phone = str(int(time.time()))[:10]
         self.phone = f'+7 {self.raw_phone[:3]} {self.raw_phone[3:6]} {self.raw_phone[6:8]} {self.raw_phone[8:]}'
-        self.inn = '8383838383838383838'
-        self.bank_card = '5454545454545454'
-        self.page.go_to_add_performer()
+        self.password = 'AUTOTEST IS THE BEST'
+        self.object_n_services = [True, False, True, False, True]
+        self.page.go_to_add_responsible()
 
-        self.page.add_performer(self.performer_fio, self.birthyear, self.passport, self.phone)
+        self.page.add_responsible(self.fio, self.email, self.raw_phone, self.password, self.object_n_services)
         time.sleep(1)
         yield
         try:
-            if self.page.get_current_tab() == PerformerPage.ACTIVE_TAB:
-                self.page.go_to_blacklist()
-                self.page.blacklist()
+            if self.page.get_current_tab() == ResponsiblePage.ACTIVE_TAB:
+                self.page.go_to_archive()
+                self.page.archive()
         except Exception as e:
-            blacklist_fail(e, self.performer_fio)
+            archive_fail(e, self.fio)
 
-    def test_can_open_blacklist_tab(self, browser):
+    def test_can_open_archive_tab(self, browser):
         self.page.go_to_removed_tab()
-
-    def test_can_blacklist_person(self, browser):
-        self.page.go_to_blacklist()
-        self.page.blacklist()
-
-    def test_can_cancel_blacklist(self, browser):
-        self.page.go_to_blacklist()
-        self.page.cancel_blacklist()
-        self.page.check_performer_info(self.performer_fio, self.phone)
-
-    def test_check_blacklisted_person_info(self, browser):
-        self.page.go_to_blacklist()
-        self.page.blacklist()
-        self.page.go_to_removed_tab()
-        self.page.check_performer_info(self.performer_fio, self.phone)
-
-    def test_check_blacklisted_person_detailed_info(self, browser):
-        comment = str(int(time.time()))
-        self.page.go_to_blacklist()
-        self.page.blacklist(str(int(time.time())))
-        self.page.go_to_removed_tab()
-        self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone,
-                                                expected_status=PerformerPage.BLACKLIST_STATUS,
-                                                expected_comment=comment)
-
-    def test_check_blacklist_comment(self, browser):
-        comment = 'This is a test comment made by auto-test!'
-
-        self.page.go_to_blacklist()
-        self.page.blacklist(comment)
-        self.page.go_to_removed_tab()
-        self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone,
-                                                expected_status=PerformerPage.BLACKLIST_STATUS,
-                                                expected_comment=comment)
-
-    def test_can_blacklist_through_detailed_info_and_save(self, browser):
-        comment = 'This is a test comment made by auto-test! Commented in detailed info!'
-
-        self.page.go_to_detailed_info()
-        self.page.change_performer_status(PerformerPage.BLACKLIST_STATUS, comment)
-        self.page.save_performer()
-
-        self.page.go_to_removed_tab()
-        self.page.check_performer_info(self.performer_fio, self.phone)
-        self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone,
-                                                expected_status=PerformerPage.BLACKLIST_STATUS,
-                                                expected_comment=comment)
-
-    def test_can_blacklist_through_detailed_info_and_not_save(self, browser):
-        comment = 'This is a test comment made by auto-test! Commented in detailed info!'
-
-        self.page.go_to_detailed_info()
-        self.page.change_performer_status(PerformerPage.BLACKLIST_STATUS, comment)
-        self.page.close_drawer()  # просто закрываем, не сохраняем!
-
-        # self.page.go_to_removed_tab()  # поэтому лицо должно остаться в списке активных
-        self.page.check_performer_info(self.performer_fio, self.phone)
-        self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone)
-        self.page.close_drawer()
-
-    def test_can_unblacklist_person(self, browser):
-        self.page.go_to_blacklist()
-        self.page.blacklist()
-        self.page.go_to_removed_tab()
-        self.page.go_to_unblacklist()
-        self.page.unblacklist()
         self.page.go_to_active_tab()
-        self.page.check_performer_info(self.performer_fio, self.phone)
-        self.page.close_drawer()
 
-    def test_can_cancel_unblacklist_person(self, browser):
-        self.page.go_to_blacklist()
-        self.page.blacklist()
+    def test_can_open_archive_msgbox(self, browser):
+        self.page.go_to_archive()
+        self.page.should_be_responsible_archive()
+        self.page.close_msgbox()
+
+    def test_can_close_archive_msgbox(self, browser):
+        self.page.go_to_archive()
+        self.page.close_msgbox()
+        self.page.should_not_be_responsible_archive(ResponsiblePage.DISAPPEAR)
+
+    def test_can_archive_responsible(self, browser):
+        self.page.go_to_archive()
+        self.page.archive()
         self.page.go_to_removed_tab()
-        self.page.go_to_unblacklist()
-        self.page.cancel_unblacklist()
-        self.page.check_performer_info(self.performer_fio, self.phone)
 
-    def test_can_unblacklist_through_detailed_info_and_save(self, browser):
-        comment = 'This is a test comment made by auto-test! Commented in detailed info!'
+    def test_can_cancel_archive(self, browser):
+        self.page.go_to_archive()
+        self.page.cancel_archive()
+        self.page.check_responsible_info(self.fio, self.email, self.phone, self.object_n_services)
 
-        self.page.go_to_detailed_info()
-        self.page.change_performer_status(PerformerPage.BLACKLIST_STATUS, comment)
-        self.page.save_performer()
+    def test_check_archived_responsible_info(self, browser):
+        self.page.go_to_archive()
+        self.page.archive()
+        self.page.go_to_removed_tab()
+        self.page.check_responsible_info(self.fio, self.email, self.phone, self.object_n_services)
 
+    def test_check_archived_responsible_detailed_info(self, browser):
+        self.page.go_to_archive()
+        self.page.archive()
         self.page.go_to_removed_tab()
         self.page.go_to_detailed_info()
-        self.page.change_performer_status(PerformerPage.ACTIVE_STATUS)
-        self.page.save_performer()
+        self.page.check_responsible_detailed_info(self.fio, self.email, self.phone, self.object_n_services)
 
+    def test_can_open_unarchive_msgbox(self, browser):
+        self.page.go_to_archive()
+        self.page.archive()
+        self.page.go_to_removed_tab()
+        self.page.go_to_unarchive()
+        self.page.should_be_responsible_unarchive()
+
+    def test_can_close_unarchive_msgbox(self, browser):
+        self.page.go_to_archive()
+        self.page.archive()
+        self.page.go_to_removed_tab()
+        self.page.go_to_unarchive()
+        self.page.close_msgbox()
+        self.page.should_not_be_responsible_unarchive(ResponsiblePage.DISAPPEAR)
+
+    def test_can_unarchive_responsible(self, browser):
+        self.page.go_to_archive()
+        self.page.archive()
+        self.page.go_to_removed_tab()
+        self.page.go_to_unarchive()
+        self.page.unarchive()
         self.page.go_to_active_tab()
-        self.page.check_performer_info(self.performer_fio, self.phone)
-        self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone)
+        self.page.check_responsible_info(self.fio, self.email, self.phone, self.object_n_services)
 
-    def test_can_unblacklist_through_detailed_info_and_not_save(self, browser):
-        comment = 'This is a test comment made by auto-test! Commented in detailed info!'
-
-        self.page.go_to_detailed_info()
-        self.page.change_performer_status(PerformerPage.BLACKLIST_STATUS, comment)
-        self.page.save_performer()
-
+    def test_can_cancel_unarchive_responsible(self, browser):
+        self.page.go_to_archive()
+        self.page.archive()
         self.page.go_to_removed_tab()
-        self.page.go_to_detailed_info()
-        self.page.change_performer_status(PerformerPage.ACTIVE_STATUS)
-        self.page.close_drawer()  # просто закрываем, не сохраняем!
+        self.page.go_to_unarchive()
+        self.page.cancel_unarchive()
+        self.page.check_responsible_info(self.fio, self.email, self.phone, self.object_n_services)
 
-        # self.page.go_to_active_tab()  # поэтому лицо должно остаться в чёрном списке
-        self.page.check_performer_info(self.performer_fio, self.phone)
+    def test_check_unarchived_responsible_info(self, browser):
+        self.page.go_to_archive()
+        self.page.archive()
+        self.page.go_to_removed_tab()
+        self.page.go_to_unarchive()
+        self.page.unarchive()
+        self.page.go_to_active_tab()
+        self.page.check_responsible_info(self.fio, self.email, self.phone, self.object_n_services)
+
+    def test_check_unarchived_responsible_detailed_info(self, browser):
+        self.page.go_to_archive()
+        self.page.archive()
+        self.page.go_to_removed_tab()
+        self.page.go_to_unarchive()
+        self.page.unarchive()
+        self.page.go_to_active_tab()
         self.page.go_to_detailed_info()
-        self.page.check_performer_detailed_info(self.performer_fio, self.birthyear, self.passport, self.phone,
-                                                expected_status=PerformerPage.BLACKLIST_STATUS,
-                                                expected_comment=comment)
-'''
+        self.page.check_responsible_detailed_info(self.fio, self.email, self.phone, self.object_n_services)
+        self.page.close_drawer()
