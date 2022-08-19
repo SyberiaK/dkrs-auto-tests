@@ -1,11 +1,10 @@
 import time
-import datetime as dt
 
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 
 from .person_page import PersonPage
-from .locators import PersonPageLocators, ResponsiblePageLocators
+from .locators import ResponsiblePageLocators
 
 
 class ResponsiblePage(PersonPage):
@@ -215,14 +214,62 @@ class ResponsiblePage(PersonPage):
                 for elem_name, elem_path in ResponsiblePageLocators.RESPONSIBLE_CHANGEPASS.items():
                     assert self.is_disappeared(*elem_path), f'{elem_name} is presented, but it should disappear'
 
+    def change_password(self, password: str):
+        self.browser.find_element(*ResponsiblePageLocators.RESPONSIBLE_CHANGEPASS_NEWPASS_INPUT).send_keys(password)
+        self.browser.find_element(*ResponsiblePageLocators.RESPONSIBLE_CHANGEPASS_CONFIRMPASS_INPUT).send_keys(password)
+        self.browser.find_element(*ResponsiblePageLocators.RESPONSIBLE_CHANGEPASS_CONFIRM_BTN).click()
+        time.sleep(1)
+
+    def cancel_change_password(self):
+        self.browser.find_element(*ResponsiblePageLocators.RESPONSIBLE_CHANGEPASS_CANCEL_BTN).click()
+        time.sleep(1)
+
     def go_to_archive(self):
         if self.get_current_tab() == ResponsiblePage.ACTIVE_TAB:
             self.browser.find_element(*ResponsiblePageLocators.RESPONSIBLE_ADD_TO_ARCHIVE_BTN).click()
         else:
-            raise Exception('Not an active tab so can\'t go to blacklist')
+            raise Exception('Not an active tab so can\'t go to archive')
+
+    def should_be_responsible_archive(self):
+        for elem_name, elem_path in ResponsiblePageLocators.RESPONSIBLE_AR.items():
+            assert self.is_element_present(*elem_path), f'{elem_name} is not presented'
+
+    def should_not_be_responsible_archive(self, action: str):
+        match action:
+            case PersonPage.NOT_PRESENT:
+                for elem_name, elem_path in ResponsiblePageLocators.RESPONSIBLE_AR.items():
+                    assert self.is_not_element_present(*elem_path), f'{elem_name} is presented, but it shouldn\'t be'
+            case PersonPage.DISAPPEAR:
+                for elem_name, elem_path in ResponsiblePageLocators.RESPONSIBLE_AR.items():
+                    assert self.is_disappeared(*elem_path), f'{elem_name} is presented, but it should disappear'
 
     def archive(self):
         self.browser.find_element(*ResponsiblePageLocators.RESPONSIBLE_AR_CONFIRM_BTN).click()
 
     def cancel_archive(self):
         self.browser.find_element(*ResponsiblePageLocators.RESPONSIBLE_AR_CANCEL_BTN).click()
+
+    def go_to_unarchive(self):
+        if self.get_current_tab() == ResponsiblePage.REMOVED_TAB:
+            self.browser.find_element(*ResponsiblePageLocators.RESPONSIBLE_RETURN_FROM_ARCHIVE_BTN).click()
+        else:
+            raise Exception('Not a archive tab so can\'t go to unarchive')
+
+    def should_be_responsible_unarchive(self):
+        for elem_name, elem_path in ResponsiblePageLocators.RESPONSIBLE_UNAR.items():
+            assert self.is_element_present(*elem_path), f'{elem_name} is not presented'
+
+    def should_not_be_responsible_unarchive(self, action: str):
+        match action:
+            case PersonPage.NOT_PRESENT:
+                for elem_name, elem_path in ResponsiblePageLocators.RESPONSIBLE_UNAR.items():
+                    assert self.is_not_element_present(*elem_path), f'{elem_name} is presented, but it shouldn\'t be'
+            case PersonPage.DISAPPEAR:
+                for elem_name, elem_path in ResponsiblePageLocators.RESPONSIBLE_UNAR.items():
+                    assert self.is_disappeared(*elem_path), f'{elem_name} is presented, but it should disappear'
+
+    def unarchive(self):
+        self.browser.find_element(*ResponsiblePageLocators.RESPONSIBLE_UNAR_CONFIRM_BTN).click()
+
+    def cancel_unarchive(self):
+        self.browser.find_element(*ResponsiblePageLocators.RESPONSIBLE_UNAR_CANCEL_BTN).click()

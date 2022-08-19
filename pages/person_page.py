@@ -38,21 +38,3 @@ class PersonPage(BasePage):
     def close_msgbox(self):
         self.browser.find_element(*PersonPageLocators.MSGBOX_CLOSE_BTN).click()
         time.sleep(1)
-
-    '''def cancel(self,
-               dec: str):
-        if dec == 'cancel':
-            self.browser.find_element(*WorkPageLocators.MSGBOX_CANCEL_BTN).click()
-        elif dec == 'leave':
-            self.browser.find_element(*WorkPageLocators.MSGBOX_LEAVE_BTN).click()
-        else:
-            raise AssertionError('Wrong decision (decisions avaliable: cancel, leave)')
-
-    def delete_element(self,
-                       dec: str):
-        if dec == 'cancel':
-            self.browser.find_element(*WorkPageLocators.MSGBOX2_CANCEL_BTN).click()
-        elif dec == 'delete':
-            self.browser.find_element(*WorkPageLocators.MSGBOX2_DELETE_BTN).click()
-        else:
-            raise AssertionError('Wrong decision (decisions available: cancel, delete)')'''

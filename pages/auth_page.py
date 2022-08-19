@@ -11,5 +11,4 @@ class AuthPage(BasePage):
     def auth(self, login, password):
         self.browser.find_element(*AuthPageLocators.LOGIN_INPUT).send_keys(login)
         self.browser.find_element(*AuthPageLocators.PASSWORD_INPUT).send_keys(password)
-
         self.browser.find_element(*AuthPageLocators.LOGIN_BTN).click()

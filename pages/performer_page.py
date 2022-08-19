@@ -272,7 +272,7 @@ class PerformerPage(PersonPage):
 
     def go_to_unblacklist(self):
         if self.get_current_tab() == PerformerPage.REMOVED_TAB:
-            self.browser.find_element(*PerformerPageLocators.PERFORMER_ADD_TO_BLACKLIST_BTN).click()
+            self.browser.find_element(*PerformerPageLocators.PERFORMER_RETURN_FROM_BLACKLIST_BTN).click()
         else:
             raise Exception('Not a blacklist tab so can\'t go to unblacklist')
 
